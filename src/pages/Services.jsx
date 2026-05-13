@@ -143,23 +143,19 @@ const detailedServices = [
 ];
 
 const supportSteps = [
+  
   {
     step: "01",
-    title: "Contact us",
-    text: "Start with a conversation about the support you are looking for and who it is for.",
-  },
-  {
-    step: "02",
     title: "Initial meeting",
     text: "We take time to understand your circumstances, preferences, and current supports.",
   },
   {
-    step: "03",
+    step: "02",
     title: "Needs and goals assessment",
     text: "Support planning is shaped around clinical needs, day-to-day priorities, and NDIS goals.",
   },
   {
-    step: "04",
+    step: "03",
     title: "Care plan and service agreement",
     text: "Once details are clear, we confirm the approach and move into service commencement.",
   },
@@ -184,7 +180,7 @@ export default function Services() {
           <ScrollReveal>
             <SectionHeader
               badge="Services Overview"
-              title="A service mix built around independence, access, and dependable support."
+              title="What We Offer"
               description="We deliver supports that help clients manage health needs, maintain routines, build skills, and engage with their communities more confidently."
               align="center"
               className="mx-auto"
@@ -228,12 +224,13 @@ export default function Services() {
 
               return (
                 <ScrollReveal key={service.eyebrow} delay={index * 80}>
-                  <Card className="overflow-hidden border-sand/70 bg-white p-0">
+                  <Card className="overflow-hidden border-sand/70 bg-white p-0" >
                     <div className="grid gap-0 lg:grid-cols-[0.9fr_1.1fr]">
                       <div
                         className={`px-7 py-8 sm:px-8 sm:py-10 ${
                           dark ? "bg-[#0F4C4B] text-white" : "bg-[#FBF6ED] text-ink"
                         }`}
+                        style={{borderRadius: '30px'}}
                       >
                         <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/14">
                           <Icon />
@@ -298,10 +295,11 @@ export default function Services() {
             <ScrollReveal>
               <SectionHeader
                 badge="How We Set Up Your Supports"
-                title="A simple process built around listening carefully and planning well."
-                description="We take a structured approach so supports start with clarity, realistic planning, and agreement on what good service delivery should look like."
+                title="Our Process"
+                description=""
               />
             </ScrollReveal>
+            {/* We take a structured approach so supports start with clarity, realistic planning, and agreement on what good service delivery should look like. */}
 
             <div className="mt-10 grid gap-4">
               {supportSteps.map((item, index) => (

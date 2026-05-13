@@ -4,7 +4,7 @@ import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
 import ScrollReveal from "../components/ui/ScrollReveal";
 import SectionHeader from "../components/ui/SectionHeader";
-import { pageMedia, pageMeta } from "../data/site";
+import { company, pageMedia, pageMeta } from "../data/site";
 import { trainingModules } from "../data/training";
 import { usePageSeo } from "../hooks/usePageSeo";
 
@@ -85,6 +85,13 @@ export default function StaffTraining() {
     () => trainingModules.find((module) => module.id === selectedId),
     [selectedId],
   );
+  const completionRecords = useMemo(
+    () =>
+      Object.values(records).sort(
+        (a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime(),
+      ),
+    [records],
+  );
 
   const selectedRecord = selectedModule ? records[selectedModule.id] : null;
 
@@ -94,6 +101,12 @@ export default function StaffTraining() {
     setStaffName(selectedRecord?.staffName || "");
     setStaffNameError("");
   }, [selectedId, selectedRecord?.staffName]);
+
+  useEffect(() => {
+    return () => {
+      document.body.classList.remove("printing-certificate");
+    };
+  }, []);
 
   function moduleStatus(module) {
     if (records[module.id]?.completedAt) {
@@ -146,12 +159,14 @@ export default function StaffTraining() {
       return;
     }
 
+    const existingRecord = records[selectedModule.id];
+
     const completion = {
       moduleId: selectedModule.id,
       moduleTitle: selectedModule.title,
       staffName: staffName.trim(),
       completedAt: new Date().toISOString(),
-      certificateId: createCertificateId(selectedModule.id),
+      certificateId: existingRecord?.certificateId ?? createCertificateId(selectedModule.id),
       score: quizResult.score,
       total: selectedModule.quiz.length,
     };
@@ -167,7 +182,11 @@ export default function StaffTraining() {
   }
 
   function printCertificate() {
+    document.body.classList.add("printing-certificate");
     window.print();
+    window.setTimeout(() => {
+      document.body.classList.remove("printing-certificate");
+    }, 200);
   }
 
   return (
@@ -368,7 +387,7 @@ export default function StaffTraining() {
                         ) : null}
                         <div>
                           <Button onClick={completeModule} size="lg">
-                            Generate Certificate
+                            {selectedRecord ? "Update Certificate" : "Generate Certificate"}
                           </Button>
                         </div>
                       </div>
@@ -381,19 +400,19 @@ export default function StaffTraining() {
                 )}
               </Card>
             </ScrollReveal>
-
-            <ScrollReveal delay={120}>
-              <Card className="border-sand/80 bg-[#0F4C4B] p-7 text-white">
-                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-teal-200">
-                  Admin note
+            <ScrollReveal delay={80}>
+              <Card className="border-sand/80 bg-[linear-gradient(180deg,#F3FBFA_0%,#FBFEFE_100%)] p-7">
+                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#015451]">
+                  Admin Note
                 </p>
-                <p className="mt-4 text-sm leading-8 text-white/78">
+                <p className="mt-4 text-sm leading-8 text-ink/68">
                   This is a frontend training demo. For production, connect to secure staff
                   accounts, backend records, trainer verification, expiry dates, and compliance
                   reporting.
                 </p>
               </Card>
             </ScrollReveal>
+
           </div>
         </div>
       </section>
@@ -411,7 +430,10 @@ export default function StaffTraining() {
           <div className="mt-12 grid gap-8 xl:grid-cols-[1.08fr_0.92fr]">
             <ScrollReveal>
               {selectedRecord ? (
-                <div className="rounded-[2rem] border-[10px] border-[#D5EDE6] bg-[#FBFFFE] p-4 shadow-soft sm:p-6">
+                <div
+                  data-print-certificate
+                  className="rounded-[2rem] border-[10px] border-[#D5EDE6] bg-[#FBFFFE] p-4 shadow-soft sm:p-6"
+                >
                   <div className="rounded-[1.6rem] border border-[#8DCFC2] px-6 py-8 text-center sm:px-10 sm:py-12">
                     <img
                       src="/assets/brand/logo.png"
@@ -484,17 +506,24 @@ export default function StaffTraining() {
                   Stored completion records
                 </p>
                 <div className="mt-6 grid gap-4">
-                  {Object.keys(records).length > 0 ? (
-                    Object.values(records).map((record) => (
+                  {completionRecords.length > 0 ? (
+                    completionRecords.map((record) => (
                       <button
                         key={record.certificateId}
                         type="button"
                         onClick={() => setSelectedId(record.moduleId)}
-                        className="rounded-[1.4rem] border border-sand/90 bg-white px-4 py-4 text-left hover:border-[#0C7380]"
+                        className={`rounded-[1.4rem] border px-4 py-4 text-left transition ${
+                          record.moduleId === selectedId
+                            ? "border-[#0C7380] bg-[#EAF8F7]"
+                            : "border-sand/90 bg-white hover:border-[#0C7380]"
+                        }`}
                       >
                         <p className="text-sm font-semibold text-ink">{record.moduleTitle}</p>
                         <p className="mt-2 text-sm leading-7 text-ink/64">
                           {record.staffName} • {formatDate(record.completedAt)}
+                        </p>
+                        <p className="mt-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#0C7380]">
+                          {record.certificateId}
                         </p>
                       </button>
                     ))

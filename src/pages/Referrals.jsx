@@ -174,8 +174,6 @@ export default function Referrals() {
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(null);
 
-  const directEmail = "admin@emergingnursing.com";
-
   const supportSummary = useMemo(() => form.supportRequired.join(", "), [form.supportRequired]);
 
   function updateField(name, value) {
@@ -242,8 +240,8 @@ export default function Referrals() {
             <ScrollReveal>
               <div className="rounded-[2rem] border border-white/40 bg-white/68 p-7 shadow-soft backdrop-saturate-150 sm:p-8">
                 <SectionHeader
-                  badge="Referral Overview"
-                  title="A simple, professional way to begin support."
+                  badge="Referrals"
+                  title="Referral Form"
                   description="Emerging Nursing and Disability Services works with participants, families, carers, support coordinators, and plan managers to arrange suitable NDIS supports."
                 />
               </div>
@@ -623,7 +621,7 @@ export default function Referrals() {
             </ScrollReveal>
 
             <ScrollReveal delay={180}>
-              <Card className="border-sand/80 bg-[#0F4C4B] p-7 text-white">
+              <Card className="border-sand/80 bg-[#0F4C4B] p-7 text-white hidden">
                 <p className="text-sm font-semibold uppercase tracking-[0.24em] text-teal-200">
                   Contact directly
                 </p>
@@ -634,11 +632,11 @@ export default function Referrals() {
                     </span>
                     <span className="text-sm font-semibold">{company.phone}</span>
                   </a>
-                  <a href={`mailto:${directEmail}`} className="flex items-center gap-3 rounded-[1.4rem] bg-white/8 px-4 py-4 hover:bg-white/12">
+                  <a href={company.emailHref} className="flex items-center gap-3 rounded-[1.4rem] bg-white/8 px-4 py-4 hover:bg-white/12">
                     <span className="text-teal-200">
                       <MailIcon />
                     </span>
-                    <span className="text-sm font-semibold">{directEmail}</span>
+                    <span className="text-sm font-semibold">{company.email}</span>
                   </a>
                 </div>
               </Card>

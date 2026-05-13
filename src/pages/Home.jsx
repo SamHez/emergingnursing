@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import Badge from "../components/ui/Badge";
 import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
-import Reveal from "../components/ui/Reveal";
+import Reveal from "../components/ui/ScrollReveal";
 import SectionHeader from "../components/ui/SectionHeader";
 import {
   company,
@@ -106,7 +106,7 @@ const serviceIcons = [HeartPulseIcon, SparkIcon, HomeIcon, ClipboardIcon, Commun
 
 function HeroSection() {
   return (
-    <section className="relative min-h-[30rem] overflow-hidden bg-[#082D36] sm:min-h-[46rem] lg:min-h-[30rem]">
+    <section className="relative min-h-[22rem] overflow-hidden bg-[#082D36] sm:min-h-[38rem] lg:min-h-[38rem]">
       <img
         src={homeMedia.hero}
         alt="Support worker assisting a participant with guided upper-body movement"
@@ -114,24 +114,19 @@ function HeroSection() {
       />
       <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(6,30,37,0.76)_0%,rgba(6,30,37,0.66)_30%,rgba(6,30,37,0.52)_58%,rgba(6,30,37,0.4)_100%)]" />
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,30,36,0.12)_0%,rgba(5,30,36,0.18)_32%,rgba(6,52,62,0.62)_72%,rgba(6,52,62,0.94)_100%)]" />
-      
 
-      <div className="site-container relative flex min-h-[44rem] flex-col items-center justify-center pb-14 pt-[12.5rem] text-center sm:pb-16 sm:pt-[13rem] lg:min-h-30rem] lg:pb-20 lg:pt-[3rem]">
+      <div className="site-container relative flex min-h-[22rem] flex-col items-center justify-center pb-10 pt-[12rem] text-center sm:min-h-[32rem] sm:pb-12 sm:pt-[12.5rem] lg:min-h-[34rem] lg:pb-14 lg:pt-[11.5rem]">
         <Reveal className="mx-auto w-full max-w-4xl">
-          <div className="space-y-7">
+          <div className="space-y-6">
             <div className="flex flex-wrap justify-center gap-3">
               <Badge tone="teal">Registered NDIS Provider</Badge>
-              {/*<Badge>Western Australia</Badge>*/}
             </div>
 
-            <div className="space-y-5">
-              {/*<p className="text-sm font-semibold uppercase tracking-[0.28em] text-teal-100/85">
-                Emerging Nursing and Disability Services
-              </p>*/}
-              <h1 className="mx-auto max-w-4xl text-balance text-[1.2rem] font-display font-semibold leading-[1.04] text-white sm:text-[3.35rem] lg:text-[3.4rem]">
+            <div className="space-y-4">
+              <h1 className="mx-auto max-w-4xl text-balance text-[2rem] font-display font-semibold leading-[1.02] text-white sm:text-[3rem] lg:text-[3.2rem]">
                 Empowering Independence Through NDIS Support
               </h1>
-              <p className="mx-auto max-w-2xl text-base leading-8 text-white/80 sm:text-sm">
+              <p className="mx-auto max-w-2xl text-sm leading-7 text-white sm:text-base">
                 Emerging Nursing and Disability Services supports Australians with disabilities to
                 live with greater autonomy, confidence, and choice.
               </p>
@@ -148,21 +143,6 @@ function HeroSection() {
           </div>
         </Reveal>
 
-        {/*<Reveal className="mt-12 w-full hidden">
-          <div className="mx-auto grid max-w-4xl gap-4 md:grid-cols-2 xl:grid-cols-4">
-            {homeHeroCards.map((item, index) => (
-              <div
-                key={`${item.title}-${index}`}
-                className="rounded-[1.8rem] border border-white/12 bg-white/10 p-5 text-left text-white shadow-glass"
-              >
-                <p className="text-sm font-semibold uppercase tracking-[0.22em] text-teal-100/84">
-                  {item.title}
-                </p>
-                <p className="mt-3 text-sm leading-7 text-white/78">{item.text}</p>
-              </div>
-            ))}
-          </div>
-        </Reveal>*/}
       </div>
     </section>
   );
@@ -175,7 +155,7 @@ function TrustStripSection() {
         <Reveal className="grid gap-0 border-b border-sand/80 py-8 md:grid-cols-[0.92fr_1.08fr] lg:grid-cols-[0.8fr_1.2fr]">
           <div className="pb-6 md:border-r md:border-sand/80 md:pb-0 md:pr-8">
             <p className="max-w-[16rem] text-xl font-semibold leading-tight text-ink">
-              Trusted support foundations for participants and families across Western Australia.
+              Trusted support for families across Western Australia.
             </p>
           </div>
 
@@ -210,7 +190,7 @@ function AboutSection() {
           <div className="max-w-2xl space-y-6">
             <Badge tone="default">About Emerging Nursing</Badge>
             <h2 className="text-balance text-4xl font-display font-semibold leading-[1.02] text-ink sm:text-5xl">
-              Respectful support that strengthens independence, wellbeing, and everyday confidence.
+              Respectful support that strengthens independence
             </h2>
             <p className="max-w-xl text-base leading-8 text-ink/68 sm:text-lg">
               Emerging Nursing and Disability Services supports people through the NDIS and aims to
@@ -352,11 +332,11 @@ function ChoiceSection() {
           <div className="h-full rounded-[2rem] bg-[#103F47] p-8 text-white shadow-soft sm:p-10 lg:p-12">
             <Badge tone="default">Choice and Control</Badge>
             <h2 className="mt-6 max-w-2xl text-balance text-4xl font-display font-semibold leading-[1.02] text-white sm:text-5xl">
-              Planning stays grounded in participant choice, personal values, and everyday realities.
+              Why Choose Emerging Nursing
             </h2>
             <p className="mt-5 max-w-xl text-base leading-8 text-white/74">
               Emerging Nursing works to ensure support feels tailored, respectful, and aligned with
-              the participant’s goals, preferences, and NDIS plan.
+              the participant’s goals and NDIS plan.
             </p>
 
             <div className="mt-8 grid gap-4">
@@ -475,7 +455,7 @@ function FaqSection() {
           <div className="max-w-xl space-y-5">
             <Badge tone="default">Support Info</Badge>
             <h2 className="text-balance text-4xl font-display font-semibold leading-[1.04] text-ink sm:text-5xl">
-              Clear answers for participants, families, and referral partners.
+              Frequently Asked Questions
             </h2>
             <p className="text-base leading-8 text-ink/68">
               A short overview of common questions about how supports begin, how referrals work,

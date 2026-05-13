@@ -4,8 +4,9 @@ export const company = {
   registration: "Registered NDIS Provider in Western Australia",
   phone: "+61 480 220 127",
   phoneHref: "tel:+61480220127",
-  email: "admin@emergingnursing.com.au",
-  emailHref: "mailto:admin@emergingnursing.com.au",
+  email: "admin@emergingnursing.com",
+  emailHref: "mailto:admin@emergingnursing.com",
+  contactLocations: ["High Wycombe, WA, Australia", "Caversham, WA, Australia"],
   topBarLocation: "High Wycombe, WA, Australia",
   locations: ["High Wycombe, WA", "Caversham, WA"],
   aim: "To enable Australians with disabilities to live as autonomously and independently as possible.",
@@ -132,6 +133,8 @@ export const pageMedia = {
     "https://images.pexels.com/photos/7551673/pexels-photo-7551673.jpeg?auto=compress&cs=tinysrgb&w=1800",
   trainingHero:
     "https://images.pexels.com/photos/5726794/pexels-photo-5726794.jpeg?auto=compress&cs=tinysrgb&w=1800",
+  contactHero:
+    "https://images.pexels.com/photos/7551645/pexels-photo-7551645.jpeg?auto=compress&cs=tinysrgb&w=1800",
 };
 
 export const homeHeroCards = [
@@ -156,19 +159,19 @@ export const homeHeroCards = [
 export const homeTrustStrip = [
   {
     title: "Registered NDIS Provider",
-    note: "Trusted support delivery",
+    note: "",
   },
   {
     title: "WA Based Team",
-    note: "Local knowledge and coordination",
+    note: "",
   },
   {
     title: "Nursing-Led Support",
-    note: "Clinical confidence where needed",
+    note: "",
   },
   {
     title: "Choice & Control",
-    note: "Support shaped around goals",
+    note: "",
   },
 ];
 
@@ -226,10 +229,9 @@ export const homeSteps = [
 export const homeChoicePoints = [
   "You stay involved in planning and decision-making.",
   "Your preferences, goals, and values guide support.",
-  "Regular feedback and care plan reviews keep services aligned.",
   "Supports are tailored to your lifestyle and NDIS plan.",
 ];
-
+  {/*"Regular feedback and care plan reviews keep services aligned.",*/}
 export const homeTrainingItems = [
   "Internal training modules for care quality and service consistency",
   "Complex care awareness for higher-needs participant support",

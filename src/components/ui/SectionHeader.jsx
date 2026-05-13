@@ -18,6 +18,7 @@ export default function SectionHeader({
       <div className="space-y-4">
         <h2
           className={`text-balance text-3xl font-display font-semibold leading-tight sm:text-4xl lg:text-[3.25rem] ${headingTone}`}
+          style={{lineHeight: '50px'}}
         >
           {title}
         </h2>

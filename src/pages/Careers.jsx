@@ -180,10 +180,11 @@ export default function Careers() {
 
   return (
     <div className="bg-cream">
+      {/*Join a caring, professional team supporting people with disabilities across Western Australia.*/}
       <FeaturePageHero
         chips={["CAREERS", "Join Our Team"]}
         title="Careers at Emerging Nursing"
-        description="Join a caring, professional team supporting people with disabilities across Western Australia."
+        description=""
         note="We are building a team of compassionate professionals who care deeply about quality support, respectful relationships, and meaningful participant outcomes."
         image={pageMedia.careersHero}
         actions={
@@ -203,8 +204,8 @@ export default function Careers() {
         <div className="site-container">
           <ScrollReveal>
             <SectionHeader
-              badge="Why Work With Us"
-              title="A workplace shaped by care quality, trust, and steady professional support."
+              badge="Why Emerging Nursing"
+              title="Why Work With Us"
               description="We want people who are thoughtful, capable, and committed to supporting participants with dignity and consistency."
               align="center"
               className="mx-auto"
@@ -236,18 +237,18 @@ export default function Careers() {
         <div className="site-container">
           <ScrollReveal>
             <SectionHeader
-              badge="Current Vacancies"
-              title="Sample roles ready to edit as real vacancies change."
-              description="These are demo vacancies and can be updated later in src/data/jobs.js as hiring needs change."
+              badge="Vacancies"
+              title="Current Vacancies"
+              description=""
             />
           </ScrollReveal>
 
-          <div className="mt-12 grid gap-6 xl:grid-cols-2">
+          <div className="mt-12 grid gap-6 xl:grid-cols-2 ">
             {sampleJobs.map((job, index) => (
               <ScrollReveal key={job.title} delay={index * 80}>
                 <Card className="h-full border-sand/80 bg-white p-0 overflow-hidden">
                   <div className="grid h-full gap-0 lg:grid-cols-[0.82fr_1.18fr]">
-                    <div className="bg-[linear-gradient(180deg,#0F4C4B_0%,#0B6764_100%)] px-7 py-8 text-white">
+                    <div className="bg-[linear-gradient(180deg,#0F4C4B_0%,#0B6764_100%)] px-7 py-8 text-white" style={{borderRadius: '30px'}}>
                       <p className="text-sm font-semibold uppercase tracking-[0.24em] text-teal-100/84">
                         Vacancy
                       </p>

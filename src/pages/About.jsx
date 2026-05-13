@@ -87,16 +87,11 @@ const policies = [
     title: "Infection Control",
     text: "Clinical hygiene and infection prevention practices are embedded in everyday service delivery.",
   },
-  {
-    title: "Child Safety",
-    text: "Where children and young people are involved, their safety and wellbeing remain a priority.",
-  },
 ];
 
 const approachPoints = [
   "Choice and control remain central to how supports are discussed, planned, and reviewed.",
   "Clients are actively involved in planning and decision-making around their support pathway.",
-  "Care is shaped around personal values, preferences, routines, and long-term goals.",
   "Our team brings disability support experience and practical care understanding to each service arrangement.",
 ];
 
@@ -130,7 +125,7 @@ export default function About() {
           <ScrollReveal delay={100}>
             <SectionHeader
               badge="Who We Are"
-              title="Support grounded in autonomy, compassion, and dependable care."
+              title="Compassion, and Dependable Care"
               description="Emerging Nursing and Disability Services is a registered NDIS Provider in Western Australia. We support people with disabilities to live as autonomously and independently as possible."
             />
             <div className="mt-8 flex flex-wrap gap-3">
@@ -215,8 +210,8 @@ export default function About() {
         <div className="site-container grid gap-10 lg:grid-cols-[1.08fr_0.92fr] lg:items-center">
           <ScrollReveal>
             <SectionHeader
-              badge="Person-Centred Approach"
-              title="Planning stays centred on the person, not just the service."
+              badge="Approach"
+              title="Person-Centered Approach"
               description="We believe strong supports are built through collaboration, practical understanding, and care that reflects what matters most to the individual."
             />
             <div className="mt-8 grid gap-4">

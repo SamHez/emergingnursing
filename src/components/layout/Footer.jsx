@@ -28,15 +28,14 @@ export default function Footer() {
         <div className="mt-10 grid gap-10 rounded-[2.2rem] border border-white/12 bg-white/[0.08] p-8 shadow-soft lg:grid-cols-[1.2fr_0.78fr_0.9fr_0.82fr] lg:p-11">
           <div className="space-y-6">
             <img
-              src="/assets/brand/logo.png"
+              src="/assets/brand/logo-white.png"
               alt={company.shortName}
-              className="h-16 w-auto rounded-[1.35rem] bg-white px-4 py-3"
+              className="h-30 w-auto px-4 py-3"
             />
             <div className="space-y-3">
               <p className="text-sm font-semibold uppercase tracking-[0.28em] text-teal-200">Person-Centred Care</p>
               <p className="max-w-lg text-sm leading-8 text-white/78">
-                Emerging Nursing and Disability Services supports people through the NDIS with
-                empathy, accountability, and practical care shaped around autonomy and choice.
+                Emerging Nursing and Disability Services supports people through the NDIS 
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
@@ -71,9 +70,9 @@ export default function Footer() {
             </p>
             <div className="mt-4 grid gap-3">
               {footerServices.map((item) => (
-                <p key={item} className="text-sm leading-8 text-white/78">
+                <Link key={item} to="/services" className="text-sm leading-8 text-white/78 hover:text-white">
                   {item}
-                </p>
+                </Link>
               ))}
             </div>
           </div>
@@ -84,7 +83,7 @@ export default function Footer() {
                 Contact
               </p>
               <div className="mt-4 space-y-4 text-sm leading-8 text-white/78">
-                <p>{company.registration}</p>
+                <p>Mon-Sun 8am - 10pm</p>
                 <a href={company.phoneHref} className="block hover:text-white">
                   {company.phone}
                 </a>
