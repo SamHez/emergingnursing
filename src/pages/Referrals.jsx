@@ -235,21 +235,45 @@ export default function Referrals() {
       <section className="relative overflow-hidden bg-[#F6F3EC] py-16 sm:py-20 lg:py-24">
         <div className="pointer-events-none absolute left-[-8rem] top-8 h-48 w-48 rounded-full bg-white/70" />
         <div className="pointer-events-none absolute right-[-8rem] bottom-8 h-56 w-56 rounded-full bg-teal-100/70" />
-        <div className="site-container grid gap-8 xl:grid-cols-[1.15fr_0.85fr]">
-          <div className="grid gap-6">
-            <ScrollReveal>
-              <div className="rounded-[2rem] border border-white/40 bg-white/68 p-7 shadow-soft backdrop-saturate-150 sm:p-8">
-                <SectionHeader
-                  badge="Referrals"
-                  title="Referral Form"
-                  description="Emerging Nursing and Disability Services works with participants, families, carers, support coordinators, and plan managers to arrange suitable NDIS supports."
-                />
-              </div>
-            </ScrollReveal>
+        <div className="site-container">
+          <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
+            <div>
+              <ScrollReveal>
+                <div className="rounded-[2rem] border border-white/40 bg-white/68 p-7 shadow-soft backdrop-saturate-150 sm:p-8">
+                  <SectionHeader
+                    badge="Referrals"
+                    title="Referral Form"
+                    description="Emerging Nursing and Disability Services works with participants, families, carers, support coordinators, and plan managers to arrange suitable NDIS supports."
+                  />
+                </div>
+              </ScrollReveal>
+            </div>
 
-            <ScrollReveal delay={80}>
-              <div className="rounded-[2.2rem] border border-white/45 bg-white/62 p-4 shadow-soft sm:p-5">
-                {submitted ? (
+            <div>
+              <ScrollReveal>
+                <Card className="border-sand/80 bg-white/74 p-7">
+                  <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#015451]">
+                    What happens next?
+                  </p>
+                  <div className="mt-6 grid gap-3">
+                    {nextSteps.slice(0, 3).map((item, index) => (
+                      <div key={item} className="flex items-start gap-3">
+                        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#0C7380] text-sm font-bold text-white">
+                          {index + 1}
+                        </span>
+                        <p className="pt-1 text-sm leading-6 text-ink/72">{item}</p>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+              </ScrollReveal>
+            </div>
+          </div>
+
+          {submitted ? (
+            <div className="mt-6 grid gap-8 xl:grid-cols-[1.15fr_0.85fr]">
+              <div className="grid gap-6">
+                <ScrollReveal>
                   <div className="rounded-[1.8rem] bg-[#0F4C4B] px-6 py-8 text-white sm:px-8">
                     <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/12 text-teal-100">
                       <CheckIcon />
@@ -262,16 +286,13 @@ export default function Referrals() {
                     </p>
                     <div className="mt-6 rounded-[1.5rem] bg-white/10 px-5 py-5 text-sm leading-7 text-white/84">
                       <p>
-                        <span className="font-semibold text-white">Participant:</span>{" "}
-                        {submitted.participantName}
+                        <span className="font-semibold text-white">Participant:</span> {submitted.participantName}
                       </p>
                       <p>
-                        <span className="font-semibold text-white">Support requested:</span>{" "}
-                        {submitted.supportSummary}
+                        <span className="font-semibold text-white">Support requested:</span> {submitted.supportSummary}
                       </p>
                       <p>
-                        <span className="font-semibold text-white">Urgency:</span>{" "}
-                        {submitted.urgency}
+                        <span className="font-semibold text-white">Urgency:</span> {submitted.urgency}
                       </p>
                     </div>
                     <div className="mt-6 flex flex-col gap-4 sm:flex-row">
@@ -283,105 +304,133 @@ export default function Referrals() {
                       </Button>
                     </div>
                   </div>
-                ) : (
-                  <form noValidate onSubmit={handleSubmit} className="grid gap-5">
-                    <SectionBlock
-                      title="Participant Details"
-                      description="Basic participant information helps us understand who the referral is for and how to make contact."
+                </ScrollReveal>
+              </div>
+
+              <div className="grid gap-6">
+                <ScrollReveal delay={120}>
+                  <Card className="border-sand/80 bg-white/74 p-7">
+                    <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#015451]">
+                      What happens next?
+                    </p>
+                    <div className="mt-6 grid gap-4">
+                      {nextSteps.map((item, index) => (
+                        <div key={item} className="flex items-start gap-4 rounded-[1.5rem] bg-[#F8FBFA] px-4 py-4">
+                          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0C7380] text-sm font-bold text-white">
+                            {index + 1}
+                          </span>
+                          <p className="pt-1 text-sm leading-7 text-ink/72">{item}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </Card>
+                </ScrollReveal>
+              </div>
+            </div>
+          ) : (
+            <form noValidate onSubmit={handleSubmit} className="mt-6 grid gap-8 xl:grid-cols-[1.15fr_0.85fr]">
+              <div className="xl:col-span-2">
+                <SectionBlock
+                  title="Participant Details"
+                  description="Basic participant information helps us understand who the referral is for and how to make contact."
+                >
+                  <div className="grid gap-5 sm:grid-cols-2">
+                    <Field label="Participant full name" name="participantName" error={errors.participantName} required>
+                      <input
+                        id="participantName"
+                        name="participantName"
+                        type="text"
+                        value={form.participantName}
+                        onChange={(event) => updateField("participantName", event.target.value)}
+                        className={inputClasses(Boolean(errors.participantName))}
+                        aria-invalid={Boolean(errors.participantName)}
+                      />
+                    </Field>
+                    <Field label="Date of birth" name="dateOfBirth" error={errors.dateOfBirth} required>
+                      <input
+                        id="dateOfBirth"
+                        name="dateOfBirth"
+                        type="date"
+                        value={form.dateOfBirth}
+                        onChange={(event) => updateField("dateOfBirth", event.target.value)}
+                        className={inputClasses(Boolean(errors.dateOfBirth))}
+                        aria-invalid={Boolean(errors.dateOfBirth)}
+                      />
+                    </Field>
+                    <Field label="Phone" name="participantPhone" error={errors.participantPhone} required>
+                      <input
+                        id="participantPhone"
+                        name="participantPhone"
+                        type="tel"
+                        value={form.participantPhone}
+                        onChange={(event) => updateField("participantPhone", event.target.value)}
+                        className={inputClasses(Boolean(errors.participantPhone))}
+                        aria-invalid={Boolean(errors.participantPhone)}
+                      />
+                    </Field>
+                    <Field label="Email" name="participantEmail" error={errors.participantEmail} required>
+                      <input
+                        id="participantEmail"
+                        name="participantEmail"
+                        type="email"
+                        value={form.participantEmail}
+                        onChange={(event) => updateField("participantEmail", event.target.value)}
+                        className={inputClasses(Boolean(errors.participantEmail))}
+                        aria-invalid={Boolean(errors.participantEmail)}
+                      />
+                    </Field>
+                    <Field label="Address/suburb" name="address" error={errors.address} required>
+                      <input
+                        id="address"
+                        name="address"
+                        type="text"
+                        value={form.address}
+                        onChange={(event) => updateField("address", event.target.value)}
+                        className={inputClasses(Boolean(errors.address))}
+                        aria-invalid={Boolean(errors.address)}
+                      />
+                    </Field>
+                    <Field label="NDIS number" name="ndisNumber" error={errors.ndisNumber} required>
+                      <input
+                        id="ndisNumber"
+                        name="ndisNumber"
+                        type="text"
+                        value={form.ndisNumber}
+                        onChange={(event) => updateField("ndisNumber", event.target.value)}
+                        className={inputClasses(Boolean(errors.ndisNumber))}
+                        aria-invalid={Boolean(errors.ndisNumber)}
+                      />
+                    </Field>
+                  </div>
+
+                  <div className="mt-5">
+                    <Field
+                      label="Preferred contact method"
+                      name="preferredContactMethod"
+                      error={errors.preferredContactMethod}
+                      required
                     >
-                      <div className="grid gap-5 sm:grid-cols-2">
-                        <Field label="Participant full name" name="participantName" error={errors.participantName} required>
-                          <input
-                            id="participantName"
-                            name="participantName"
-                            type="text"
-                            value={form.participantName}
-                            onChange={(event) => updateField("participantName", event.target.value)}
-                            className={inputClasses(Boolean(errors.participantName))}
-                            aria-invalid={Boolean(errors.participantName)}
-                          />
-                        </Field>
-                        <Field label="Date of birth" name="dateOfBirth" error={errors.dateOfBirth} required>
-                          <input
-                            id="dateOfBirth"
-                            name="dateOfBirth"
-                            type="date"
-                            value={form.dateOfBirth}
-                            onChange={(event) => updateField("dateOfBirth", event.target.value)}
-                            className={inputClasses(Boolean(errors.dateOfBirth))}
-                            aria-invalid={Boolean(errors.dateOfBirth)}
-                          />
-                        </Field>
-                        <Field label="Phone" name="participantPhone" error={errors.participantPhone} required>
-                          <input
-                            id="participantPhone"
-                            name="participantPhone"
-                            type="tel"
-                            value={form.participantPhone}
-                            onChange={(event) => updateField("participantPhone", event.target.value)}
-                            className={inputClasses(Boolean(errors.participantPhone))}
-                            aria-invalid={Boolean(errors.participantPhone)}
-                          />
-                        </Field>
-                        <Field label="Email" name="participantEmail" error={errors.participantEmail} required>
-                          <input
-                            id="participantEmail"
-                            name="participantEmail"
-                            type="email"
-                            value={form.participantEmail}
-                            onChange={(event) => updateField("participantEmail", event.target.value)}
-                            className={inputClasses(Boolean(errors.participantEmail))}
-                            aria-invalid={Boolean(errors.participantEmail)}
-                          />
-                        </Field>
-                        <Field label="Address/suburb" name="address" error={errors.address} required>
-                          <input
-                            id="address"
-                            name="address"
-                            type="text"
-                            value={form.address}
-                            onChange={(event) => updateField("address", event.target.value)}
-                            className={inputClasses(Boolean(errors.address))}
-                            aria-invalid={Boolean(errors.address)}
-                          />
-                        </Field>
-                        <Field label="NDIS number" name="ndisNumber" error={errors.ndisNumber} required>
-                          <input
-                            id="ndisNumber"
-                            name="ndisNumber"
-                            type="text"
-                            value={form.ndisNumber}
-                            onChange={(event) => updateField("ndisNumber", event.target.value)}
-                            className={inputClasses(Boolean(errors.ndisNumber))}
-                            aria-invalid={Boolean(errors.ndisNumber)}
-                          />
-                        </Field>
-                      </div>
+                      <select
+                        id="preferredContactMethod"
+                        name="preferredContactMethod"
+                        value={form.preferredContactMethod}
+                        onChange={(event) => updateField("preferredContactMethod", event.target.value)}
+                        className={inputClasses(Boolean(errors.preferredContactMethod))}
+                        aria-invalid={Boolean(errors.preferredContactMethod)}
+                      >
+                        <option value="">Select one</option>
+                        <option value="Phone">Phone</option>
+                        <option value="Email">Email</option>
+                        <option value="Either">Either</option>
+                      </select>
+                    </Field>
+                  </div>
+                </SectionBlock>
+              </div>
 
-                      <div className="mt-5">
-                        <Field
-                          label="Preferred contact method"
-                          name="preferredContactMethod"
-                          error={errors.preferredContactMethod}
-                          required
-                        >
-                          <select
-                            id="preferredContactMethod"
-                            name="preferredContactMethod"
-                            value={form.preferredContactMethod}
-                            onChange={(event) => updateField("preferredContactMethod", event.target.value)}
-                            className={inputClasses(Boolean(errors.preferredContactMethod))}
-                            aria-invalid={Boolean(errors.preferredContactMethod)}
-                          >
-                            <option value="">Select one</option>
-                            <option value="Phone">Phone</option>
-                            <option value="Email">Email</option>
-                            <option value="Either">Either</option>
-                          </select>
-                        </Field>
-                      </div>
-                    </SectionBlock>
-
+              <div className="xl:col-span-2">
+                <ScrollReveal>
+                  <div className="rounded-[2.2rem] border border-white/45 bg-white/62 p-4 shadow-soft sm:p-5">
                     <SectionBlock
                       title="Referrer Details"
                       description="Tell us who is making the referral and how they are connected to the participant."
@@ -595,53 +644,35 @@ export default function Referrals() {
                         Submit Referral
                       </Button>
                     </div>
-                  </form>
-                )}
+                  </div>
+                </ScrollReveal>
               </div>
-            </ScrollReveal>
-          </div>
 
-          <div className="grid gap-6">
-            <ScrollReveal delay={120}>
-              <Card className="border-sand/80 bg-white/74 p-7">
-                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#015451]">
-                  What happens next?
-                </p>
-                <div className="mt-6 grid gap-4">
-                  {nextSteps.map((item, index) => (
-                    <div key={item} className="flex items-start gap-4 rounded-[1.5rem] bg-[#F8FBFA] px-4 py-4">
-                      <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0C7380] text-sm font-bold text-white">
-                        {index + 1}
-                      </span>
-                      <p className="pt-1 text-sm leading-7 text-ink/72">{item}</p>
+              <div className="grid gap-6">
+                <ScrollReveal delay={120}>
+                  <Card className="border-sand/80 bg-white/74 p-7 hidden">
+                    <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#015451]">
+                      Contact directly
+                    </p>
+                    <div className="mt-6 grid gap-4">
+                      <a href={company.phoneHref} className="flex items-center gap-3 rounded-[1.4rem] bg-white/8 px-4 py-4 hover:bg-white/12">
+                        <span className="text-teal-200">
+                          <PhoneIcon />
+                        </span>
+                        <span className="text-sm font-semibold">{company.phone}</span>
+                      </a>
+                      <a href={company.emailHref} className="flex items-center gap-3 rounded-[1.4rem] bg-white/8 px-4 py-4 hover:bg-white/12">
+                        <span className="text-teal-200">
+                          <MailIcon />
+                        </span>
+                        <span className="text-sm font-semibold">{company.email}</span>
+                      </a>
                     </div>
-                  ))}
-                </div>
-              </Card>
-            </ScrollReveal>
-
-            <ScrollReveal delay={180}>
-              <Card className="border-sand/80 bg-[#0F4C4B] p-7 text-white hidden">
-                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-teal-200">
-                  Contact directly
-                </p>
-                <div className="mt-6 grid gap-4">
-                  <a href={company.phoneHref} className="flex items-center gap-3 rounded-[1.4rem] bg-white/8 px-4 py-4 hover:bg-white/12">
-                    <span className="text-teal-200">
-                      <PhoneIcon />
-                    </span>
-                    <span className="text-sm font-semibold">{company.phone}</span>
-                  </a>
-                  <a href={company.emailHref} className="flex items-center gap-3 rounded-[1.4rem] bg-white/8 px-4 py-4 hover:bg-white/12">
-                    <span className="text-teal-200">
-                      <MailIcon />
-                    </span>
-                    <span className="text-sm font-semibold">{company.email}</span>
-                  </a>
-                </div>
-              </Card>
-            </ScrollReveal>
-          </div>
+                  </Card>
+                </ScrollReveal>
+              </div>
+            </form>
+          )}
         </div>
       </section>
     </div>

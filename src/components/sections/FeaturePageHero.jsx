@@ -45,7 +45,7 @@ export default function FeaturePageHero({
           </ScrollReveal>
 
           {note ? (
-            <ScrollReveal delay={120} className="lg:justify-self-end">
+            <ScrollReveal delay={120} className="hidden lg:block lg:justify-self-end">
               <p className="max-w-xl text-sm leading-7 text-white sm:text-base lg:text-right">
                 {note}
               </p>

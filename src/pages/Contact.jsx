@@ -230,7 +230,7 @@ export default function Contact() {
       <section className="relative overflow-hidden bg-[#F4F8F7] py-16 sm:py-20 lg:py-24">
         <div className="pointer-events-none absolute left-[-10rem] top-20 h-56 w-56 rounded-full bg-white/80" />
         <div className="site-container grid gap-8 xl:grid-cols-[1.08fr_0.92fr]">
-          <div className="grid gap-6">
+          <div className="xl:col-span-2">
             <ScrollReveal>
               <div className="rounded-[2.2rem] border border-white/45 bg-white/72 p-4 shadow-soft">
                 {submitted ? (
@@ -266,7 +266,7 @@ export default function Contact() {
                       description="Use this form for general enquiries, referrals, training questions, careers interest, or feedback."
                     />
 
-                    <div className="mt-8 grid gap-5 sm:grid-cols-2">
+                    <div className="mt-8 grid gap-5">
                       <Field label="Full name" name="fullName" error={errors.fullName} required>
                         <input
                           id="fullName"
@@ -341,9 +341,7 @@ export default function Contact() {
                     </div>
 
                     <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                      <p className="text-sm leading-7 text-ink/62">
-                        Backend integration for email or CRM handling can be connected here later.
-                      </p>
+                      
                       <Button type="submit" size="lg" className="justify-center">
                         Send Enquiry
                       </Button>

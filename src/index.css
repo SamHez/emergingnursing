@@ -72,6 +72,28 @@
     background-size: 36px 36px;
   }
 
+  .bg-lines {
+    background-image: repeating-linear-gradient(0deg, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 1px, transparent 2px, transparent 6px), linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+    background-size: 100% 100%, auto;
+    animation: lines-move 12s linear infinite;
+  }
+
+  @keyframes lines-move {
+    from { background-position: 0 0, 0 0; }
+    to { background-position: 0 100px, 0 0; }
+  }
+
+  .animate-type-caret {
+    opacity: 1;
+    animation: blink 1s steps(2,end) infinite;
+  }
+
+  @keyframes blink {
+    0% { opacity: 1 }
+    50% { opacity: 0 }
+    100% { opacity: 1 }
+  }
+
   .mask-fade-bottom {
     mask-image: linear-gradient(to bottom, black 72%, transparent 100%);
   }

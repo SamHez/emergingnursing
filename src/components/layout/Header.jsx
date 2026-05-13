@@ -90,6 +90,14 @@ export default function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  useEffect(() => {
+    // Prevent body scroll when mobile drawer is open
+    document.body.style.overflow = isOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
+
   const navWrapClassName = isHome ? "-mb-[4.9rem] sm:-mb-[5.3rem]" : "";
   const panelClassName = isScrolled
     ? "border-[#d6e4e3] bg-white/96 shadow-soft"
@@ -109,7 +117,7 @@ export default function Header() {
             <p className="tracking-[0.18em] text-white/92">
               Registered NDIS Provider in Western Australia
             </p>
-            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-white/88">
+            <div className="hidden sm:flex flex-wrap items-center gap-x-5 gap-y-2 text-white/88">
               <a href={company.emailHref} className="inline-flex items-center gap-2 hover:text-white">
                 <ContactIcon>
                   <MailIcon />
@@ -178,24 +186,50 @@ export default function Header() {
               </button>
             </div>
 
-            <div
-              className={`overflow-hidden transition-all duration-300 lg:hidden ${
-                isOpen ? "max-h-[34rem] pb-4" : "max-h-0"
-              }`}
-            >
-              <div className={`mx-4 rounded-[1.75rem] border p-4 ${mobilePanelTone}`}>
-                <nav className="flex flex-col gap-2">
+            {/* Mobile drawer: full-height left slide-in panel */}
+            <div className={`fixed inset-0 z-[90] sm:hidden pointer-events-none`} aria-hidden={!isOpen}>
+              {/* overlay */}
+              <div
+                className={`absolute inset-0 bg-black/40 transition-opacity duration-300 ${
+                  isOpen ? "opacity-100 pointer-events-auto" : "opacity-0"
+                }`}
+                onClick={() => setIsOpen(false)}
+              />
+
+              {/* sliding panel */}
+              <aside
+                className={`fixed left-0 top-0 bottom-0 z-[91] w-80 transform-gpu bg-[#013B39] p-4 transition-transform duration-300 ease-in-out ${
+                  isOpen ? "translate-x-0 pointer-events-auto" : "-translate-x-full pointer-events-none"
+                }`}
+                role="dialog"
+                aria-modal={isOpen}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex items-center justify-between">
+                  <Link to="/" onClick={() => setIsOpen(false)} className="flex items-center gap-3">
+                    <img src={logoSrc} alt={company.shortName} className="h-9 w-auto" />
+                  </Link>
+                  <button
+                    type="button"
+                    aria-label="Close navigation"
+                    onClick={() => setIsOpen(false)}
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/10 text-white"
+                  >
+                    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M6 6l12 12M18 6 6 18" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </button>
+                </div>
+
+                <nav className="mt-6 flex h-[calc(100%-220px)] flex-col gap-3 overflow-auto text-white">
                   {navigation.map((item) => (
                     <NavLink
                       key={item.href}
                       to={item.href}
+                      onClick={() => setIsOpen(false)}
                       className={({ isActive }) =>
                         `rounded-2xl px-4 py-3 text-sm font-semibold ${
-                          isActive
-                            ? "bg-[#015451] text-white"
-                            : isScrolled || !isHome
-                              ? "text-ink/78 hover:bg-[#f1f7f6] hover:text-[#015451]"
-                              : "text-white/84 hover:bg-white/10 hover:text-white"
+                          isActive ? "bg-[#015451] text-white" : "text-white/90"
                         }`
                       }
                     >
@@ -204,33 +238,27 @@ export default function Header() {
                   ))}
                 </nav>
 
-                <div className="mt-4 grid gap-3 rounded-[1.5rem] bg-[#015451] px-4 py-4 text-white">
-                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-white/68">
-                    Contact
-                  </p>
-                  <a
-                    href={company.phoneHref}
-                    className="inline-flex items-center gap-2 text-sm font-semibold"
-                  >
+                <div className="mt-4 rounded-[1rem] bg-[#015451] px-4 py-4 text-white">
+                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-white/88">Contact</p>
+                  <a href={company.phoneHref} className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-white">
                     <PhoneIcon />
                     <span>{company.phone}</span>
                   </a>
-                  <a
-                    href={company.emailHref}
-                    className="inline-flex items-center gap-2 text-sm text-white/82"
-                  >
+                  <a href={company.emailHref} className="mt-2 inline-flex items-center gap-2 text-sm text-white/82">
                     <MailIcon />
                     <span>{company.email}</span>
                   </a>
-                  <p className="inline-flex items-center gap-2 text-sm text-white/82">
+                  <p className="mt-2 inline-flex items-center gap-2 text-sm text-white/82">
                     <MapPinIcon />
                     <span>{company.topBarLocation}</span>
                   </p>
-                  <Button to="/referrals" variant="secondary" className="w-full justify-center">
-                    Make a Referral
-                  </Button>
+                  <div className="mt-4">
+                    <Button to="/referrals" variant="secondary" className="w-full justify-center">
+                      Make a Referral
+                    </Button>
+                  </div>
                 </div>
-              </div>
+              </aside>
             </div>
           </div>
           </div>

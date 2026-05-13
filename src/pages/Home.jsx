@@ -5,6 +5,7 @@ import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
 import Reveal from "../components/ui/ScrollReveal";
 import SectionHeader from "../components/ui/SectionHeader";
+import Typewriter from "../components/ui/Typewriter";
 import {
   company,
   homeChoicePoints,
@@ -18,9 +19,9 @@ import {
 } from "../data/site";
 import { usePageSeo } from "../hooks/usePageSeo";
 
-function ShieldIcon() {
+function ShieldIcon({ className = "h-5 w-5" }) {
   return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2">
       <path
         d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"
         strokeLinecap="round"
@@ -30,9 +31,9 @@ function ShieldIcon() {
   );
 }
 
-function HeartPulseIcon() {
+function HeartPulseIcon({ className = "h-5 w-5" }) {
   return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2">
       <path
         d="M19.5 13.57 12 21l-7.5-7.43A5 5 0 0 1 12 6.18a5 5 0 0 1 7.5 7.39Z"
         strokeLinecap="round"
@@ -43,9 +44,9 @@ function HeartPulseIcon() {
   );
 }
 
-function HomeIcon() {
+function HomeIcon({ className = "h-5 w-5" }) {
   return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2">
       <path d="m3 10.5 9-7 9 7" strokeLinecap="round" strokeLinejoin="round" />
       <path d="M5 9.5V20h14V9.5" strokeLinecap="round" strokeLinejoin="round" />
       <path d="M9.5 20v-6h5v6" strokeLinecap="round" strokeLinejoin="round" />
@@ -53,9 +54,9 @@ function HomeIcon() {
   );
 }
 
-function CommunityIcon() {
+function CommunityIcon({ className = "h-5 w-5" }) {
   return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2">
       <path d="M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2" strokeLinecap="round" />
       <circle cx="9.5" cy="7" r="3.5" />
       <path d="M20 21v-2a4 4 0 0 0-3-3.87" strokeLinecap="round" />
@@ -64,9 +65,9 @@ function CommunityIcon() {
   );
 }
 
-function SparkIcon() {
+function SparkIcon({ className = "h-5 w-5" }) {
   return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2">
       <path d="m12 3 1.8 4.2L18 9l-4.2 1.8L12 15l-1.8-4.2L6 9l4.2-1.8L12 3Z" />
       <path d="M5 19l.8 1.8L7.5 22l-1.7.8L5 24l-.8-1.2L2.5 22l1.7-1.2L5 19Z" />
       <path d="m19 14 .8 1.8L21.5 17l-1.7.8L19 19l-.8-1.2-1.7-.8 1.7-1.2L19 14Z" />
@@ -74,9 +75,9 @@ function SparkIcon() {
   );
 }
 
-function ClipboardIcon() {
+function ClipboardIcon({ className = "h-5 w-5" }) {
   return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2">
       <rect x="8" y="3" width="8" height="4" rx="1.5" />
       <path d="M8 5H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
       <path d="M9 12h6M9 16h4" strokeLinecap="round" />
@@ -84,17 +85,17 @@ function ClipboardIcon() {
   );
 }
 
-function CheckIcon() {
+function CheckIcon({ className = "h-4 w-4" }) {
   return (
-    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.2">
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2.2">
       <path d="m5 12 4 4L19 6" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
 
-function ArrowIcon() {
+function ArrowIcon({ className = "h-4 w-4" }) {
   return (
-    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2">
       <path d="M5 12h14" strokeLinecap="round" />
       <path d="m13 6 6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
@@ -124,7 +125,16 @@ function HeroSection() {
 
             <div className="space-y-4">
               <h1 className="mx-auto max-w-4xl text-balance text-[2rem] font-display font-semibold leading-[1.02] text-white sm:text-[3rem] lg:text-[3.2rem]">
-                Empowering Independence Through NDIS Support
+                <span>Empowering Independence Through </span>
+                <span className="inline-block text-[#AACD70]">
+                  NDIS&nbsp;
+                  <Typewriter
+                    words={["Support", "Services", "Care"]}
+                    speed={60}
+                    pause={900}
+                    className="text-[#AACD70]"
+                  />
+                </span>
               </h1>
               <p className="mx-auto max-w-2xl text-sm leading-7 text-white sm:text-base">
                 Emerging Nursing and Disability Services supports Australians with disabilities to
@@ -133,12 +143,16 @@ function HeroSection() {
             </div>
 
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:flex-wrap">
-              <Button to="/referrals" size="lg">
+              <Button to="/referrals" size="md">
                 Make a Referral
               </Button>
-              <Button to="/services" variant="secondary" size="lg">
+              <Link
+                to="/services"
+                className="inline-flex items-center justify-center px-6 py-3 text-base font-bold text-white"
+                style={{borderBottom: '2px solid #AACD70'}}
+              >
                 Explore Services
-              </Button>
+              </Link>
             </div>
           </div>
         </Reveal>
@@ -235,8 +249,12 @@ function AboutSection() {
 
 function ServicesSection() {
   return (
-    <section className="section-pad bg-white">
-      <div className="site-container">
+    <section className="section-pad bg-white relative overflow-hidden">
+      <div className="pointer-events-none absolute inset-0 opacity-30">
+        <div className="h-full w-full bg-lines" />
+      </div>
+
+      <div className="site-container relative">
         <Reveal>
           <SectionHeader
             badge="Our Core NDIS Support Services"
@@ -250,32 +268,46 @@ function ServicesSection() {
         <div className="mt-14 grid gap-6 md:grid-cols-2 xl:grid-cols-5">
           {homeServices.map((service, index) => {
             const Icon = serviceIcons[index];
+            const styles = [
+              "bg-[#032a29] text-white",
+              "bg-[#0b6b66] text-white",
+              "bg-[#2aa78a] text-white",
+              "bg-[#c6e58a] text-ink",
+              "bg-[#052e2e] text-white",
+            ];
+            const style = styles[index % styles.length];
 
             return (
               <Reveal key={service.title}>
-                <Card className="group h-full bg-[#F8FBFA] p-8">
-                  <div className="flex h-full flex-col">
-                    <span className="flex  h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-teal-500 to-mint-500 text-white shadow-soft">
-                      <Icon />
+                <div className={`group h-full rounded-[1.6rem] p-8 ${style} shadow-soft flex flex-col items-center justify-between transform-gpu transition-transform duration-300 ease-out hover:-translate-y-2 hover:shadow-xl overflow-hidden`}>
+                  <div className="flex flex-col items-center gap-6 text-center">
+                    <span>
+                      <Icon className="h-10 w-10" />
                     </span>
-                    <h2 className="mt-7 text-1xl font-display font-semibold leading-tight text-ink ">
+                    <h3 className={`text-lg font-display font-semibold ${style.includes("text-ink") ? "text-ink" : "text-white"}`}>
                       {service.title}
-                    </h2>
-                    <p className="mt-4 flex-1 text-sm leading-8 text-ink/66 hidden">
-                      {service.description}
-                    </p>
+                    </h3>
+                    {/* description intentionally removed to match design */}
+                  </div>
+
+                  <div className="mt-6 w-full flex justify-center">
                     <Link
                       to="/services"
-                      className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-teal-700 hover:text-teal-800"
+                      className="inline-flex items-center justify-center rounded-full px-6 py-2 text-sm font-semibold bg-white text-ink"
                     >
-                      Learn more
-                      <ArrowIcon />
+                      View details
                     </Link>
                   </div>
-                </Card>
+                </div>
               </Reveal>
             );
           })}
+        </div>
+
+        <div className="mt-10 text-center">
+          <Button to="/services" variant="secondary" size="md">
+            View all services
+          </Button>
         </div>
       </div>
     </section>

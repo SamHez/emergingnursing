@@ -293,20 +293,67 @@ export default function Careers() {
         className="relative overflow-hidden bg-white py-16 sm:py-20 lg:py-24"
       >
         <div className="pointer-events-none absolute right-[-8rem] bottom-8 h-56 w-56 rounded-full bg-teal-100/70" />
-        <div className="site-container grid gap-8 xl:grid-cols-[1.1fr_0.9fr]">
-          <div className="grid gap-6">
+        <div className="site-container">
+          <div className="mt-8 grid gap-6 md:grid-cols-3">
             <ScrollReveal>
-              <div className="rounded-[2.2rem] border border-white/45 bg-white/70 p-4 shadow-soft">
-                {submitted ? (
+              <Card className="border-sand/80 bg-white p-7">
+                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#015451]">
+                  Recruitment note
+                </p>
+                <p className="mt-4 text-sm leading-8 text-ink/68">
+                  We are looking for compassionate professionals who value accountability, trust,
+                  respect, passion, and inclusiveness.
+                </p>
+              </Card>
+            </ScrollReveal>
+
+            <ScrollReveal delay={60}>
+              <Card className="border-sand/80 bg-[linear-gradient(180deg,#0F4C4B_0%,#0D6761_100%)] p-7 text-white">
+                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-teal-200">
+                  Contact our team
+                </p>
+                <div className="mt-6 grid gap-4">
+                  <a href={company.phoneHref} className="rounded-[1.4rem] bg-white/10 px-4 py-4 hover:bg-white/14">
+                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-teal-100/78">Phone</p>
+                    <p className="mt-2 text-base font-semibold">{company.phone}</p>
+                  </a>
+                  <a href={company.emailHref} className="rounded-[1.4rem] bg-white/10 px-4 py-4 hover:bg-white/14">
+                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-teal-100/78">Email</p>
+                    <p className="mt-2 text-base font-semibold">{company.email}</p>
+                  </a>
+                </div>
+              </Card>
+            </ScrollReveal>
+
+            <ScrollReveal delay={120}>
+              <Card className="border-sand/80 bg-white p-7">
+                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#015451]">Training pathway</p>
+                <p className="mt-4 text-sm leading-8 text-ink/68">
+                  Explore the staff training demo to see how awareness modules, completion
+                  tracking, and certificate generation can support onboarding and competency
+                  workflows.
+                </p>
+                <div className="mt-6">
+                  <Button to="/staff-training" variant="ghost">
+                    View Staff Training
+                  </Button>
+                </div>
+              </Card>
+            </ScrollReveal>
+          </div>
+
+          <div className="mt-10">
+            <div className="grid gap-6">
+              <ScrollReveal>
+                <div className="rounded-[2.2rem] border border-white/45 bg-white/70 p-4 shadow-soft">
+                  {submitted ? (
                   <div className="rounded-[1.8rem] bg-[#0F4C4B] px-6 py-8 text-white sm:px-8">
                     <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/12 text-teal-100">
                       <CheckIcon />
                     </div>
                     <h2 className="mt-5 text-2xl font-bold sm:text-3xl">Application received</h2>
                     <p className="mt-4 max-w-2xl text-sm leading-7 text-white/80 sm:text-base">
-                      Thanks for your interest. This demo application has been saved locally and
-                      would be the point where a future recruitment workflow or API would receive
-                      the submission.
+                      Thanks for your interest. 
                     </p>
                     <div className="mt-6 rounded-[1.5rem] bg-white/10 px-5 py-5 text-sm leading-7 text-white/84">
                       <p>
@@ -330,9 +377,9 @@ export default function Careers() {
                 ) : (
                   <form noValidate onSubmit={handleSubmit} className="rounded-[1.8rem] bg-[#F8F4EC] p-6 sm:p-7">
                     <SectionHeader
-                      badge="Expression of Interest"
-                      title="Tell us about your experience and the role that interests you."
-                      description="This form is frontend-ready for demonstration. Your entry is validated and saved to localStorage only."
+                      badge="Intrest Form"
+                      title="Expression of Interest"
+                      description=""
                     />
 
                     <div className="mt-8 grid gap-5 sm:grid-cols-2">
@@ -471,12 +518,9 @@ export default function Careers() {
                     </div>
 
                     <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                      <p className="text-sm leading-7 text-ink/62">
-                        Future backend integration can connect this form to email, ATS software, or
-                        a recruitment API.
-                      </p>
+                   
                       <Button size="lg" type="submit" className="justify-center">
-                        Submit Expression of Interest
+                        Submit 
                       </Button>
                     </div>
                   </form>
@@ -485,58 +529,6 @@ export default function Careers() {
             </ScrollReveal>
           </div>
 
-          <div className="grid gap-6">
-            <ScrollReveal delay={120}>
-              <Card className="border-sand/80 bg-white p-7">
-                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#015451]">
-                  Recruitment note
-                </p>
-                <p className="mt-4 text-sm leading-8 text-ink/68">
-                  We are looking for compassionate professionals who value accountability, trust,
-                  respect, passion, and inclusiveness.
-                </p>
-              </Card>
-            </ScrollReveal>
-
-            <ScrollReveal delay={180}>
-              <Card className="border-sand/80 bg-[linear-gradient(180deg,#0F4C4B_0%,#0D6761_100%)] p-7 text-white">
-                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-teal-200">
-                  Contact our team
-                </p>
-                <div className="mt-6 grid gap-4">
-                  <a href={company.phoneHref} className="rounded-[1.4rem] bg-white/10 px-4 py-4 hover:bg-white/14">
-                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-teal-100/78">
-                      Phone
-                    </p>
-                    <p className="mt-2 text-base font-semibold">{company.phone}</p>
-                  </a>
-                  <a href={company.emailHref} className="rounded-[1.4rem] bg-white/10 px-4 py-4 hover:bg-white/14">
-                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-teal-100/78">
-                      Email
-                    </p>
-                    <p className="mt-2 text-base font-semibold">{company.email}</p>
-                  </a>
-                </div>
-              </Card>
-            </ScrollReveal>
-
-            <ScrollReveal delay={220}>
-              <Card className="border-sand/80 bg-white p-7">
-                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#015451]">
-                  Training pathway
-                </p>
-                <p className="mt-4 text-sm leading-8 text-ink/68">
-                  Explore the staff training demo to see how awareness modules, completion
-                  tracking, and certificate generation can support onboarding and competency
-                  workflows.
-                </p>
-                <div className="mt-6">
-                  <Button to="/staff-training" variant="ghost">
-                    View Staff Training
-                  </Button>
-                </div>
-              </Card>
-            </ScrollReveal>
           </div>
         </div>
       </section>

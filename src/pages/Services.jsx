@@ -83,14 +83,14 @@ function CheckIcon() {
 }
 
 const overviewServices = [
-  { title: "Registered and Enrolled Nurse Support", icon: NurseIcon },
-  { title: "Support Coordination", icon: CompassIcon },
-  { title: "Support Work", icon: GroupIcon },
-  { title: "Capacity Building", icon: ArrowUpIcon },
-  { title: "Community Access", icon: GroupIcon },
-  { title: "Transport Support", icon: CarIcon },
-  { title: "Employment Support", icon: BriefcaseIcon },
-  { title: "Support in the Home", icon: HomeIcon },
+  { title: "Registered and Enrolled Nurse Support", icon: NurseIcon, desc: "Clinical nursing care for complex and routine health needs at home." },
+  { title: "Support Coordination", icon: CompassIcon, desc: "Help to connect services and make your NDIS plan easier to use." },
+  { title: "Support Work", icon: GroupIcon, desc: "Practical daily living assistance to build independence and routines." },
+  { title: "Capacity Building", icon: ArrowUpIcon, desc: "Goal-focused supports to strengthen skills and community involvement." },
+  { title: "Community Access", icon: GroupIcon, desc: "Support to participate in community activities, appointments, and social life." },
+  { title: "Transport Support", icon: CarIcon, desc: "Safe and reliable transport for appointments, social activities, and essentials." },
+  { title: "Employment Support", icon: BriefcaseIcon, desc: "Practical support to find and sustain meaningful work or training." },
+  { title: "Support in the Home", icon: HomeIcon, desc: "Home-based assistance that keeps routines, safety and wellbeing steady." },
 ];
 
 const detailedServices = [
@@ -105,7 +105,6 @@ const detailedServices = [
       "Stoma/PEG management",
       "Indwelling and suprapubic catheter support",
       "Health monitoring",
-      "Complex care support",
       "Staff and family training for complex care needs",
     ],
   },
@@ -189,19 +188,22 @@ export default function Services() {
 
           <div className="mt-14 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
             {overviewServices.map((service, index) => {
-              const Icon = service.icon;
+                const Icon = service.icon;
 
-              return (
-                <ScrollReveal key={service.title} delay={index * 60}>
-                  <Card className="h-full border-sand/80 bg-[#FBFCFB] p-7">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#E8F6F4] text-[#015451]">
-                      <Icon />
-                    </div>
-                    <h2 className="mt-5 text-xl font-bold leading-tight text-ink">{service.title}</h2>
-                  </Card>
-                </ScrollReveal>
-              );
-            })}
+                return (
+                  <ScrollReveal key={service.title} delay={index * 60}>
+                    <Card className="h-full border-sand/80 bg-[#FBFCFB] p-7 flex flex-col items-start justify-between">
+                      <div>
+                        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#E8F6F4] text-[#015451]">
+                          <Icon />
+                        </div>
+                        <h2 className="mt-5 text-xl font-bold leading-tight text-ink">{service.title}</h2>
+                        <p className="mt-3 max-w-[18rem] text-sm leading-7 text-ink/72">{service.desc}</p>
+                      </div>
+                    </Card>
+                  </ScrollReveal>
+                );
+              })}
           </div>
         </div>
       </section>

@@ -19,8 +19,8 @@ export default function Footer() {
           </div>
           <div className="flex flex-wrap gap-3">
             <Button to="/referrals">Make a Referral</Button>
-            <Button to="/contact" variant="ghostDark">
-              Contact Us
+            <Button to="/staff-training" variant="ghostDark">
+              Staff Training 
             </Button>
           </div>
         </div>
