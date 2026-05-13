@@ -4,7 +4,7 @@ import Reveal from "../ui/Reveal";
 export default function MetricsSection() {
   return (
     <section className="site-container mt-6">
-      <Reveal className="rounded-[2.5rem] border border-white/50 bg-white/70 px-6 py-8 shadow-soft backdrop-blur-xl sm:px-8">
+      <Reveal className="rounded-[2.5rem] border border-white/50 bg-white/70 px-6 py-8 shadow-soft sm:px-8">
         <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
           <div className="max-w-md">
             <p className="text-sm font-semibold uppercase tracking-[0.24em] text-teal-700">

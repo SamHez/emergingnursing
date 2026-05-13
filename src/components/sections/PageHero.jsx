@@ -4,7 +4,7 @@ import Reveal from "../ui/Reveal";
 export default function PageHero({ badge, title, description, aside }) {
   return (
     <section className="site-container pt-12">
-      <Reveal className="overflow-hidden rounded-[2.5rem] border border-white/50 bg-white/55 p-8 shadow-soft backdrop-blur-xl sm:p-10 lg:p-14">
+      <Reveal className="overflow-hidden rounded-[2.5rem] border border-white/50 bg-white/55 p-8 shadow-soft sm:p-10 lg:p-14">
         <div className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
           <div className="space-y-6">
             <Badge tone="dark">{badge}</Badge>
@@ -16,7 +16,7 @@ export default function PageHero({ badge, title, description, aside }) {
 
           {aside ? (
             <div className="rounded-[2rem] bg-mesh-gradient p-[1px]">
-              <div className="rounded-[calc(2rem-1px)] bg-white/82 p-6 backdrop-blur-xl">{aside}</div>
+              <div className="rounded-[calc(2rem-1px)] bg-white/82 p-6">{aside}</div>
             </div>
           ) : null}
         </div>

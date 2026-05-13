@@ -6,14 +6,14 @@ export default function Footer() {
   const footerServices = homeServices.map((item) => item.title);
 
   return (
-    <footer className="mt-24 bg-[#072A33] text-white">
+    <footer className=" bg-[#015451] text-white">
       <div className="site-container py-16 lg:py-20">
-        <div className="flex flex-col gap-5 border-b border-white/10 pb-8 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-5 border-b border-white/14 pb-8 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.28em] text-teal-200">
               Emerging Nursing, Every Step
             </p>
-            <p className="mt-2 text-lg text-white/74">
+            <p className="mt-2 text-lg text-white/84">
               Registered NDIS Provider in Western Australia
             </p>
           </div>
@@ -25,17 +25,16 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-8 grid gap-10 rounded-[2rem] border border-white/10 bg-white/5 p-8 shadow-soft lg:grid-cols-[1.15fr_0.72fr_0.82fr_0.82fr]">
+        <div className="mt-10 grid gap-10 rounded-[2.2rem] border border-white/12 bg-white/[0.08] p-8 shadow-soft lg:grid-cols-[1.2fr_0.78fr_0.9fr_0.82fr] lg:p-11">
           <div className="space-y-6">
             <img
               src="/assets/brand/logo.png"
               alt={company.shortName}
-              className="h-14 w-auto rounded-2xl bg-white px-3 py-2"
+              className="h-16 w-auto rounded-[1.35rem] bg-white px-4 py-3"
             />
             <div className="space-y-3">
               <p className="text-sm font-semibold uppercase tracking-[0.28em] text-teal-200">Person-Centred Care</p>
-              <h2 className="max-w-md text-2xl font-bold leading-tight text-white">Nursing and disability support designed to improve wellbeing and protect independence.</h2>
-              <p className="max-w-lg text-sm leading-7 text-white/72">
+              <p className="max-w-lg text-sm leading-8 text-white/78">
                 Emerging Nursing and Disability Services supports people through the NDIS with
                 empathy, accountability, and practical care shaped around autonomy and choice.
               </p>
@@ -55,11 +54,14 @@ export default function Footer() {
                 <Link
                   key={item.href}
                   to={item.href}
-                  className="text-sm text-white/72 hover:text-white"
+                  className="text-sm text-white/78 hover:text-white"
                 >
                   {item.name}
                 </Link>
               ))}
+              <Link to="/staff-training" className="text-sm text-white/78 hover:text-white">
+                Staff Training
+              </Link>
             </div>
           </div>
 
@@ -69,7 +71,7 @@ export default function Footer() {
             </p>
             <div className="mt-4 grid gap-3">
               {footerServices.map((item) => (
-                <p key={item} className="text-sm text-white/72">
+                <p key={item} className="text-sm leading-8 text-white/78">
                   {item}
                 </p>
               ))}
@@ -81,7 +83,7 @@ export default function Footer() {
               <p className="text-sm font-semibold uppercase tracking-[0.24em] text-teal-200">
                 Contact
               </p>
-              <div className="mt-4 space-y-3 text-sm text-white/72">
+              <div className="mt-4 space-y-4 text-sm leading-8 text-white/78">
                 <p>{company.registration}</p>
                 <a href={company.phoneHref} className="block hover:text-white">
                   {company.phone}
@@ -95,7 +97,7 @@ export default function Footer() {
               <p className="text-sm font-semibold uppercase tracking-[0.24em] text-teal-200">
                 Locations
               </p>
-              <div className="mt-4 space-y-3 text-sm text-white/72">
+              <div className="mt-4 space-y-4 text-sm leading-8 text-white/78">
                 {company.locations.map((location) => (
                   <p key={location}>{location}</p>
                 ))}

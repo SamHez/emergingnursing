@@ -6,12 +6,13 @@ export const company = {
   phoneHref: "tel:+61480220127",
   email: "admin@emergingnursing.com.au",
   emailHref: "mailto:admin@emergingnursing.com.au",
+  topBarLocation: "High Wycombe, WA, Australia",
   locations: ["High Wycombe, WA", "Caversham, WA"],
-  aim: "Enable Australians with disabilities to live as autonomously and independently as possible.",
+  aim: "To enable Australians with disabilities to live as autonomously and independently as possible.",
   mission:
-    "Create an environment that improves and promotes client wellbeing and helps clients meet their goals through empathy and quality care.",
+    "To create an environment that improves and promotes the wellbeing of client outcomes and helps clients meet their goals by providing empathy and quality care.",
   vision:
-    "Be a leading nursing and disability services provider that meets unique client needs and provides high-quality services for people in the community.",
+    "To be a leading nursing and disability services provider that meets the unique needs of our clients and provides high-quality services for people in the community.",
   values: ["Accountability", "Trust", "Respect", "Passion", "Inclusiveness"],
 };
 
@@ -114,10 +115,37 @@ export const homeMedia = {
     "https://images.pexels.com/photos/18429373/pexels-photo-18429373.jpeg?auto=compress&cs=tinysrgb&w=1400",
 };
 
+export const pageMedia = {
+  aboutHero:
+    "https://images.pexels.com/photos/7446988/pexels-photo-7446988.jpeg?auto=compress&cs=tinysrgb&w=1800",
+  aboutStory:
+    "https://images.pexels.com/photos/29372727/pexels-photo-29372727.jpeg?auto=compress&cs=tinysrgb&w=1600",
+  aboutApproach:
+    "https://images.pexels.com/photos/18429373/pexels-photo-18429373.jpeg?auto=compress&cs=tinysrgb&w=1600",
+  servicesHero:
+    "https://images.pexels.com/photos/7551614/pexels-photo-7551614.jpeg?auto=compress&cs=tinysrgb&w=1800",
+  servicesDetail:
+    "https://images.pexels.com/photos/6010859/pexels-photo-6010859.jpeg?auto=compress&cs=tinysrgb&w=1600",
+  referralsHero:
+    "https://images.pexels.com/photos/6010859/pexels-photo-6010859.jpeg?auto=compress&cs=tinysrgb&w=1800",
+  careersHero:
+    "https://images.pexels.com/photos/7551673/pexels-photo-7551673.jpeg?auto=compress&cs=tinysrgb&w=1800",
+  trainingHero:
+    "https://images.pexels.com/photos/5726794/pexels-photo-5726794.jpeg?auto=compress&cs=tinysrgb&w=1800",
+};
+
 export const homeHeroCards = [
   {
     title: "Person-Centred Support",
-    text: "Care shaped around your goals, preferences, and daily life.",
+    text: "",
+  },
+  {
+    title: "Call Our Team",
+    text: "+61 480 220 127",
+  },
+  {
+    title: "Call Our Team",
+    text: "+61 480 220 127",
   },
   {
     title: "Call Our Team",

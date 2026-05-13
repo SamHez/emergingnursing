@@ -106,38 +106,38 @@ const serviceIcons = [HeartPulseIcon, SparkIcon, HomeIcon, ClipboardIcon, Commun
 
 function HeroSection() {
   return (
-    <section className="relative min-h-[48rem] overflow-hidden bg-[#082D36] sm:min-h-[50rem] lg:min-h-[51rem]">
+    <section className="relative min-h-[30rem] overflow-hidden bg-[#082D36] sm:min-h-[46rem] lg:min-h-[30rem]">
       <img
         src={homeMedia.hero}
         alt="Support worker assisting a participant with guided upper-body movement"
         className="absolute inset-0 h-full w-full object-cover object-center"
       />
-      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(6,30,37,0.82)_0%,rgba(6,30,37,0.68)_34%,rgba(6,30,37,0.32)_60%,rgba(6,30,37,0.18)_100%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(6,30,37,0.76)_0%,rgba(6,30,37,0.66)_30%,rgba(6,30,37,0.52)_58%,rgba(6,30,37,0.4)_100%)]" />
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,30,36,0.12)_0%,rgba(5,30,36,0.18)_32%,rgba(6,52,62,0.62)_72%,rgba(6,52,62,0.94)_100%)]" />
-      <div className="absolute inset-x-0 bottom-0 h-56 bg-[radial-gradient(circle_at_center,rgba(24,184,176,0.18),transparent_68%)]" />
+      
 
-      <div className="site-container relative flex min-h-[48rem] flex-col justify-between pb-14 pt-[11.5rem] sm:pb-16 sm:pt-[12rem] lg:min-h-[51rem] lg:pb-20 lg:pt-[13rem]">
-        <Reveal className="max-w-3xl">
+      <div className="site-container relative flex min-h-[44rem] flex-col items-center justify-center pb-14 pt-[12.5rem] text-center sm:pb-16 sm:pt-[13rem] lg:min-h-30rem] lg:pb-20 lg:pt-[3rem]">
+        <Reveal className="mx-auto w-full max-w-4xl">
           <div className="space-y-7">
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap justify-center gap-3">
               <Badge tone="teal">Registered NDIS Provider</Badge>
-              <Badge>Western Australia</Badge>
+              {/*<Badge>Western Australia</Badge>*/}
             </div>
 
             <div className="space-y-5">
-              <p className="text-sm font-semibold uppercase tracking-[0.28em] text-teal-100/85">
+              {/*<p className="text-sm font-semibold uppercase tracking-[0.28em] text-teal-100/85">
                 Emerging Nursing and Disability Services
-              </p>
-              <h1 className="max-w-4xl text-balance text-4xl font-display font-semibold leading-[0.98] text-white sm:text-5xl lg:text-[5.3rem]">
-                Empowering Independence Through Compassionate NDIS Support
+              </p>*/}
+              <h1 className="mx-auto max-w-4xl text-balance text-[1.2rem] font-display font-semibold leading-[1.04] text-white sm:text-[3.35rem] lg:text-[3.4rem]">
+                Empowering Independence Through NDIS Support
               </h1>
-              <p className="max-w-2xl text-lg leading-8 text-white/80">
+              <p className="mx-auto max-w-2xl text-base leading-8 text-white/80 sm:text-sm">
                 Emerging Nursing and Disability Services supports Australians with disabilities to
                 live with greater autonomy, confidence, and choice.
               </p>
             </div>
 
-            <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap">
+            <div className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:flex-wrap">
               <Button to="/referrals" size="lg">
                 Make a Referral
               </Button>
@@ -148,14 +148,12 @@ function HeroSection() {
           </div>
         </Reveal>
 
-        <Reveal className="mt-10 lg:mt-0 lg:self-end">
-          <div className="grid max-w-[33rem] gap-4 sm:grid-cols-2">
+        {/*<Reveal className="mt-12 w-full hidden">
+          <div className="mx-auto grid max-w-4xl gap-4 md:grid-cols-2 xl:grid-cols-4">
             {homeHeroCards.map((item, index) => (
               <div
-                key={item.title}
-                className={`rounded-[1.8rem] border border-white/15 bg-white/12 p-5 text-white shadow-glass backdrop-blur-xl ${
-                  index === 0 ? "sm:translate-y-8" : ""
-                }`}
+                key={`${item.title}-${index}`}
+                className="rounded-[1.8rem] border border-white/12 bg-white/10 p-5 text-left text-white shadow-glass"
               >
                 <p className="text-sm font-semibold uppercase tracking-[0.22em] text-teal-100/84">
                   {item.title}
@@ -164,7 +162,7 @@ function HeroSection() {
               </div>
             ))}
           </div>
-        </Reveal>
+        </Reveal>*/}
       </div>
     </section>
   );
@@ -199,55 +197,6 @@ function TrustStripSection() {
             })}
           </div>
         </Reveal>
-      </div>
-    </section>
-  );
-}
-
-function ServicesSection() {
-  return (
-    <section className="section-pad bg-white">
-      <div className="site-container">
-        <Reveal>
-          <SectionHeader
-            badge="Our Core NDIS Support Services"
-            title="Practical supports designed around independence, dignity, wellbeing, and everyday confidence."
-            description="A focused service mix delivered with calm coordination, inclusive care, and respect for each participant’s goals and circumstances."
-            align="center"
-            className="mx-auto"
-          />
-        </Reveal>
-
-        <div className="mt-14 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {homeServices.map((service, index) => {
-            const Icon = serviceIcons[index];
-
-            return (
-              <Reveal key={service.title}>
-                <Card className="group h-full bg-[#F8FBFA] p-8">
-                  <div className="flex h-full flex-col">
-                    <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-teal-500 to-mint-500 text-white shadow-soft">
-                      <Icon />
-                    </span>
-                    <h2 className="mt-7 text-2xl font-display font-semibold leading-tight text-ink">
-                      {service.title}
-                    </h2>
-                    <p className="mt-4 flex-1 text-sm leading-8 text-ink/66">
-                      {service.description}
-                    </p>
-                    <Link
-                      to="/services"
-                      className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-teal-700 hover:text-teal-800"
-                    >
-                      Learn more
-                      <ArrowIcon />
-                    </Link>
-                  </div>
-                </Card>
-              </Reveal>
-            );
-          })}
-        </div>
       </div>
     </section>
   );
@@ -289,7 +238,7 @@ function AboutSection() {
               className="h-[25rem] w-full object-cover sm:h-[28rem]"
             />
             <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(9,36,43,0.04)_0%,rgba(9,36,43,0.52)_100%)]" />
-            <div className="absolute bottom-5 left-5 right-5 rounded-[1.4rem] border border-white/15 bg-white/16 p-4 text-white shadow-glass backdrop-blur-xl sm:left-auto sm:right-5 sm:max-w-[25rem] sm:p-5">
+            <div className="absolute bottom-5 left-5 right-5 rounded-[1.4rem] border border-white/15 bg-white/16 p-4 text-white shadow-glass sm:left-auto sm:right-5 sm:max-w-[25rem] sm:p-5">
               <p className="text-sm font-semibold uppercase tracking-[0.22em] text-teal-100/86">
                 Values
               </p>
@@ -299,6 +248,55 @@ function AboutSection() {
             </div>
           </div>
         </Reveal>
+      </div>
+    </section>
+  );
+}
+
+function ServicesSection() {
+  return (
+    <section className="section-pad bg-white">
+      <div className="site-container">
+        <Reveal>
+          <SectionHeader
+            badge="Our Core NDIS Support Services"
+            title="Our Services"
+            description="A focused service mix delivered with calm coordination, inclusive care, and respect for each participant’s goals and circumstances."
+            align="center"
+            className="mx-auto"
+          />
+        </Reveal>
+
+        <div className="mt-14 grid gap-6 md:grid-cols-2 xl:grid-cols-5">
+          {homeServices.map((service, index) => {
+            const Icon = serviceIcons[index];
+
+            return (
+              <Reveal key={service.title}>
+                <Card className="group h-full bg-[#F8FBFA] p-8">
+                  <div className="flex h-full flex-col">
+                    <span className="flex  h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-teal-500 to-mint-500 text-white shadow-soft">
+                      <Icon />
+                    </span>
+                    <h2 className="mt-7 text-1xl font-display font-semibold leading-tight text-ink ">
+                      {service.title}
+                    </h2>
+                    <p className="mt-4 flex-1 text-sm leading-8 text-ink/66 hidden">
+                      {service.description}
+                    </p>
+                    <Link
+                      to="/services"
+                      className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-teal-700 hover:text-teal-800"
+                    >
+                      Learn more
+                      <ArrowIcon />
+                    </Link>
+                  </div>
+                </Card>
+              </Reveal>
+            );
+          })}
+        </div>
       </div>
     </section>
   );
@@ -537,14 +535,13 @@ export default function Home() {
     <div className="bg-cream">
       <HeroSection />
       <TrustStripSection />
-      <ServicesSection />
       <AboutSection />
-      <SupportStepsSection />
+      <ServicesSection />
       <ChoiceSection />
+      {/*<SupportStepsSection />
       <ReferralBand />
-      <CareersSection />
+      <CareersSection />*/}
       <FaqSection />
-      <FinalCtaSection />
     </div>
   );
 }

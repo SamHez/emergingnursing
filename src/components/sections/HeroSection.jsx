@@ -31,7 +31,7 @@ export default function HeroSection() {
       <div className="grid items-stretch gap-6 lg:grid-cols-[1.15fr_0.85fr]">
         <Reveal className="relative overflow-hidden rounded-[2.75rem] border border-white/50 bg-[#0C3844] px-7 py-10 text-white shadow-soft sm:px-10 sm:py-12 lg:min-h-[42rem] lg:px-14">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(56,182,236,0.22),transparent_32%),radial-gradient(circle_at_85%_25%,rgba(116,201,108,0.18),transparent_28%),linear-gradient(180deg,rgba(12,56,68,0.72),rgba(7,38,48,0.95))]" />
-          <div className="absolute inset-y-0 right-[-6rem] w-[24rem] rounded-full bg-white/10 blur-3xl" />
+          <div className="absolute inset-y-0 right-[-6rem] w-[24rem] rounded-full bg-white/10" />
           <img
             src="/assets/brand/favicon.png"
             alt=""
@@ -82,7 +82,7 @@ export default function HeroSection() {
               ].map((item) => (
                 <div
                   key={item.title}
-                  className="rounded-[1.75rem] border border-white/18 bg-white/12 p-5 backdrop-blur-md"
+                  className="rounded-[1.75rem] border border-white/18 bg-white/12 p-5"
                 >
                   <p className="text-base font-semibold">{item.title}</p>
                   <p className="mt-2 text-sm leading-7 text-white/72">{item.text}</p>
@@ -137,7 +137,7 @@ export default function HeroSection() {
                   </a>
                 </div>
                 <div className="rounded-2xl bg-white/80 p-3">
-                  <img src="/assets/brand/favicon.png" alt="" className="h-11 w-11 animate-float" />
+                  <img src="/assets/brand/favicon.png" alt="" className="h-11 w-11" />
                 </div>
               </div>
             </Card>

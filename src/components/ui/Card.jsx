@@ -7,7 +7,7 @@ export default function Card({ children, className = "", tint = "light" }) {
 
   return (
     <div
-      className={`rounded-[2rem] border p-6 shadow-soft backdrop-blur-xl ${tintMap[tint]} ${className}`}
+      className={`rounded-[2rem] border p-6 shadow-soft ${tintMap[tint]} ${className}`}
     >
       {children}
     </div>

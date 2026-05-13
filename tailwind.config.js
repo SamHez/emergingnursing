@@ -37,8 +37,8 @@ export default {
         sand: "#EBE3D7",
       },
       fontFamily: {
-        sans: ["Manrope", "ui-sans-serif", "system-ui", "sans-serif"],
-        display: ["Fraunces", "ui-serif", "Georgia", "serif"],
+        sans: ["Sora", "ui-sans-serif", "system-ui", "sans-serif"],
+        display: ["Sora", "ui-sans-serif", "system-ui", "sans-serif"],
       },
       boxShadow: {
         soft: "0 20px 60px rgba(11, 45, 54, 0.08)",
@@ -49,15 +49,6 @@ export default {
           "radial-gradient(circle at top left, rgba(56, 182, 236, 0.18), transparent 40%), radial-gradient(circle at bottom right, rgba(116, 201, 108, 0.2), transparent 35%)",
         "mesh-gradient":
           "linear-gradient(135deg, rgba(24, 184, 176, 0.16), rgba(56, 182, 236, 0.08) 40%, rgba(116, 201, 108, 0.12) 100%)",
-      },
-      keyframes: {
-        float: {
-          "0%, 100%": { transform: "translateY(0px)" },
-          "50%": { transform: "translateY(-8px)" },
-        },
-      },
-      animation: {
-        float: "float 8s ease-in-out infinite",
       },
     },
   },
