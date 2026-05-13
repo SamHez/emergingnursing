@@ -1,4 +1,56 @@
-@import url("https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap");
+@font-face {
+  font-family: "Sora";
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url("/assets/fonts/sora-latin-ext.woff2") format("woff2");
+  unicode-range:
+    U+0100-02BA,
+    U+02BD-02C5,
+    U+02C7-02CC,
+    U+02CE-02D7,
+    U+02DD-02FF,
+    U+0304,
+    U+0308,
+    U+0329,
+    U+1D00-1DBF,
+    U+1E00-1E9F,
+    U+1EF2-1EFF,
+    U+2020,
+    U+20A0-20AB,
+    U+20AD-20C0,
+    U+2113,
+    U+2C60-2C7F,
+    U+A720-A7FF;
+}
+
+@font-face {
+  font-family: "Sora";
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url("/assets/fonts/sora-latin.woff2") format("woff2");
+  unicode-range:
+    U+0000-00FF,
+    U+0131,
+    U+0152-0153,
+    U+02BB-02BC,
+    U+02C6,
+    U+02DA,
+    U+02DC,
+    U+0304,
+    U+0308,
+    U+0329,
+    U+2000-206F,
+    U+20AC,
+    U+2122,
+    U+2191,
+    U+2193,
+    U+2212,
+    U+2215,
+    U+FEFF,
+    U+FFFD;
+}
 
 @tailwind base;
 @tailwind components;
@@ -78,13 +130,42 @@
     animation: lines-move 12s linear infinite;
   }
 
+  .bg-lines-soft {
+    background-image:
+      linear-gradient(rgba(11, 45, 54, 0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(11, 45, 54, 0.03) 1px, transparent 1px);
+    background-size: 100% 28px, 28px 100%;
+    background-position: 0 0, 0 0;
+    animation: lines-soft-drift 18s linear infinite;
+  }
+
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    align-items: center;
+    gap: 0.9rem;
+    animation: marquee-scroll 22s linear infinite;
+    will-change: transform;
+  }
+
   @keyframes lines-move {
     from { background-position: 0 0, 0 0; }
     to { background-position: 0 100px, 0 0; }
   }
 
+  @keyframes lines-soft-drift {
+    from { background-position: 0 0, 0 0; }
+    to { background-position: 0 28px, 28px 0; }
+  }
+
+  @keyframes marquee-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(calc(-50% - 0.45rem)); }
+  }
+
   .animate-type-caret {
     opacity: 1;
+    display: none;
     animation: blink 1s steps(2,end) infinite;
   }
 
@@ -96,6 +177,15 @@
 
   .mask-fade-bottom {
     mask-image: linear-gradient(to bottom, black 72%, transparent 100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bg-lines,
+  .bg-lines-soft,
+  .marquee-track,
+  .animate-type-caret {
+    animation: none !important;
   }
 }
 

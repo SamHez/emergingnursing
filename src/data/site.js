@@ -108,33 +108,21 @@ export const metrics = [
 ];
 
 export const homeMedia = {
-  hero:
-    "https://images.pexels.com/photos/7551614/pexels-photo-7551614.jpeg?auto=compress&cs=tinysrgb&w=1800",
-  about:
-    "https://images.pexels.com/photos/29372727/pexels-photo-29372727.jpeg?auto=compress&cs=tinysrgb&w=1400",
-  choice:
-    "https://images.pexels.com/photos/18429373/pexels-photo-18429373.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  hero: "/assets/media/hero-home-services.jpg",
+  about: "/assets/media/home-about.jpg",
+  choice: "/assets/media/home-choice.jpg",
 };
 
 export const pageMedia = {
-  aboutHero:
-    "https://images.pexels.com/photos/7446988/pexels-photo-7446988.jpeg?auto=compress&cs=tinysrgb&w=1800",
-  aboutStory:
-    "https://images.pexels.com/photos/29372727/pexels-photo-29372727.jpeg?auto=compress&cs=tinysrgb&w=1600",
-  aboutApproach:
-    "https://images.pexels.com/photos/18429373/pexels-photo-18429373.jpeg?auto=compress&cs=tinysrgb&w=1600",
-  servicesHero:
-    "https://images.pexels.com/photos/7551614/pexels-photo-7551614.jpeg?auto=compress&cs=tinysrgb&w=1800",
-  servicesDetail:
-    "https://images.pexels.com/photos/6010859/pexels-photo-6010859.jpeg?auto=compress&cs=tinysrgb&w=1600",
-  referralsHero:
-    "https://images.pexels.com/photos/6010859/pexels-photo-6010859.jpeg?auto=compress&cs=tinysrgb&w=1800",
-  careersHero:
-    "https://images.pexels.com/photos/7551673/pexels-photo-7551673.jpeg?auto=compress&cs=tinysrgb&w=1800",
-  trainingHero:
-    "https://images.pexels.com/photos/5726794/pexels-photo-5726794.jpeg?auto=compress&cs=tinysrgb&w=1800",
-  contactHero:
-    "https://images.pexels.com/photos/7551645/pexels-photo-7551645.jpeg?auto=compress&cs=tinysrgb&w=1800",
+  aboutHero: "/assets/media/about-hero.jpg",
+  aboutStory: "/assets/media/about-story.jpg",
+  aboutApproach: "/assets/media/choice-approach.jpg",
+  servicesHero: "/assets/media/hero-home-services.jpg",
+  servicesDetail: "/assets/media/services-detail.jpg",
+  referralsHero: "/assets/media/referrals-hero.jpg",
+  careersHero: "/assets/media/careers-hero.jpg",
+  trainingHero: "/assets/media/training-hero.jpg",
+  contactHero: "/assets/media/contact-hero.jpg",
 };
 
 export const homeHeroCards = [

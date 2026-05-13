@@ -107,7 +107,7 @@ const serviceIcons = [HeartPulseIcon, SparkIcon, HomeIcon, ClipboardIcon, Commun
 
 function HeroSection() {
   return (
-    <section className="relative min-h-[22rem] overflow-hidden bg-[#082D36] sm:min-h-[38rem] lg:min-h-[38rem]">
+    <section className="relative min-h-[22rem] overflow-hidden bg-[#082D36] sm:min-h-[38rem] lg:min-h-[37.5rem]">
       <img
         src={homeMedia.hero}
         alt="Support worker assisting a participant with guided upper-body movement"
@@ -116,7 +116,7 @@ function HeroSection() {
       <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(6,30,37,0.76)_0%,rgba(6,30,37,0.66)_30%,rgba(6,30,37,0.52)_58%,rgba(6,30,37,0.4)_100%)]" />
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,30,36,0.12)_0%,rgba(5,30,36,0.18)_32%,rgba(6,52,62,0.62)_72%,rgba(6,52,62,0.94)_100%)]" />
 
-      <div className="site-container relative flex min-h-[22rem] flex-col items-center justify-center pb-10 pt-[12rem] text-center sm:min-h-[32rem] sm:pb-12 sm:pt-[12.5rem] lg:min-h-[34rem] lg:pb-14 lg:pt-[11.5rem]">
+      <div className="site-container relative flex min-h-[22rem] flex-col items-center justify-center pb-14 pt-[12rem] text-center sm:min-h-[32rem] sm:pb-12 sm:pt-[12.5rem] lg:min-h-[34rem] lg:pb-[3rem] lg:pt-[10rem]">
         <Reveal className="mx-auto w-full max-w-4xl">
           <div className="space-y-6">
             <div className="flex flex-wrap justify-center gap-3">
@@ -124,7 +124,7 @@ function HeroSection() {
             </div>
 
             <div className="space-y-4">
-              <h1 className="mx-auto max-w-4xl text-balance text-[2rem] font-display font-semibold leading-[1.02] text-white sm:text-[3rem] lg:text-[3.2rem]">
+              <h1 className="mx-auto max-w-4xl text-balance text-[1.7rem] font-display font-semibold leading-[1.02] text-white sm:text-[3rem] lg:text-[3.2rem]">
                 <span>Empowering Independence Through </span>
                 <span className="inline-block text-[#AACD70]">
                   NDIS&nbsp;
@@ -142,7 +142,7 @@ function HeroSection() {
               </p>
             </div>
 
-            <div className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:flex-wrap">
+            <div className="flex flex-col items-center justify-center gap-4 pb-2 sm:flex-row sm:flex-wrap sm:pb-0">
               <Button to="/referrals" size="md">
                 Make a Referral
               </Button>
@@ -163,34 +163,58 @@ function HeroSection() {
 }
 
 function TrustStripSection() {
+  const marqueeItems = [...homeTrustStrip, ...homeTrustStrip];
+
   return (
     <section className="bg-white">
       <div className="site-container">
-        <Reveal className="grid gap-0 border-b border-sand/80 py-8 md:grid-cols-[0.92fr_1.08fr] lg:grid-cols-[0.8fr_1.2fr]">
-          <div className="pb-6 md:border-r md:border-sand/80 md:pb-0 md:pr-8">
-            <p className="max-w-[16rem] text-xl font-semibold leading-tight text-ink">
-              Trusted support for families across Western Australia.
-            </p>
-          </div>
+        <div className="border-b border-sand/80 py-8">
+          <div className="hidden gap-0 md:grid md:grid-cols-[0.92fr_1.08fr] lg:grid-cols-[0.8fr_1.2fr]">
+            <div className="pb-6 md:border-r md:border-sand/80 md:pb-0 md:pr-8">
+              <p className="max-w-[16rem] text-xl font-semibold leading-tight text-ink">
+                Trusted support for families across Western Australia.
+              </p>
+            </div>
 
-          <div className="grid gap-5 md:grid-cols-2 md:pl-8 xl:grid-cols-4">
-            {homeTrustStrip.map((item, index) => {
-              const Icon = trustIcons[index];
+            <div className="grid gap-5 md:grid-cols-2 md:pl-8 xl:grid-cols-4">
+              {homeTrustStrip.map((item, index) => {
+                const Icon = trustIcons[index];
 
-              return (
-                <div key={item.title} className="flex items-start gap-3">
-                  <span className="mt-1 flex h-11 w-11 items-center justify-center rounded-2xl bg-teal-50 text-teal-700">
-                    <Icon />
-                  </span>
-                  <div>
-                    <p className="text-base font-bold text-ink">{item.title}</p>
-                    <p className="mt-1 text-sm leading-6 text-ink/60">{item.note}</p>
+                return (
+                  <div key={item.title} className="flex items-start gap-3">
+                    <span className="mt-1 flex h-11 w-11 items-center justify-center rounded-2xl bg-teal-50 text-teal-700">
+                      <Icon />
+                    </span>
+                    <div>
+                      <p className="text-base font-bold text-ink">{item.title}</p>
+                      <p className="mt-1 text-sm leading-6 text-ink/60">{item.note}</p>
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
-        </Reveal>
+
+          <div className="overflow-hidden md:hidden">
+            <div className="marquee-track">
+              {marqueeItems.map((item, index) => {
+                const Icon = trustIcons[index % trustIcons.length];
+
+                return (
+                  <div
+                    key={`${item.title}-${index}`}
+                    className="inline-flex flex-none items-center gap-3 rounded-full border border-sand/80 bg-[#F8FBFA] px-4 py-3 shadow-[0_8px_24px_rgba(11,45,54,0.05)]"
+                  >
+                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-teal-50 text-teal-700">
+                      <Icon />
+                    </span>
+                    <p className="whitespace-nowrap text-sm font-bold text-ink">{item.title}</p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );
@@ -250,10 +274,6 @@ function AboutSection() {
 function ServicesSection() {
   return (
     <section className="section-pad bg-white relative overflow-hidden">
-      <div className="pointer-events-none absolute inset-0 opacity-30">
-        <div className="h-full w-full bg-lines" />
-      </div>
-
       <div className="site-container relative">
         <Reveal>
           <SectionHeader
