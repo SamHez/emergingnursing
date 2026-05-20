@@ -1,5 +1,9 @@
+"use client";
+
 import { useEffect, useState } from "react";
-import { Link, NavLink, useLocation } from "react-router-dom";
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { company, navigation } from "../../data/site";
 import Button from "../ui/Button";
 
@@ -72,12 +76,12 @@ function ContactIcon({ children }) {
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const location = useLocation();
-  const isHome = location.pathname === "/";
+  const pathname = usePathname();
+  const isHome = pathname === "/";
 
   useEffect(() => {
     setIsOpen(false);
-  }, [location.pathname]);
+  }, [pathname]);
 
   useEffect(() => {
     const onScroll = () => {
@@ -126,21 +130,27 @@ export default function Header() {
     return (
       <div className={`rounded-[2rem] border transition-all duration-500 ease-out ${panelClassName}`}>
         <div className="flex items-center justify-between gap-4 px-4 py-3 lg:px-6">
-          <Link to="/" className="flex min-w-0 items-center gap-3">
-            <img src={logoSrc} alt={company.shortName} className="h-11 w-auto sm:h-12" />
+          <Link href="/" className="flex min-w-0 items-center gap-3">
+            <Image
+              src={logoSrc}
+              alt={company.shortName}
+              width={220}
+              height={80}
+              className="h-11 w-auto sm:h-12"
+            />
           </Link>
 
           <nav className={`hidden items-center gap-1 rounded-full border px-2 py-2 lg:flex ${navTone}`}>
             {navigation.map((item) => (
-              <NavLink
+              <Link
                 key={item.href}
-                to={item.href}
-                className={({ isActive }) =>
-                  `rounded-full px-4 py-2 text-sm font-semibold ${isActive ? activeTone : linkTone}`
-                }
+                href={item.href}
+                className={`rounded-full px-4 py-2 text-sm font-semibold ${
+                  pathname === item.href ? activeTone : linkTone
+                }`}
               >
                 {item.name}
-              </NavLink>
+              </Link>
             ))}
           </nav>
 
@@ -254,8 +264,14 @@ export default function Header() {
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex items-center justify-between">
-            <Link to="/" onClick={() => setIsOpen(false)} className="flex items-center gap-3">
-              <img src="/assets/brand/logo-white.png" alt={company.shortName} className="h-9 w-auto" />
+            <Link href="/" onClick={() => setIsOpen(false)} className="flex items-center gap-3">
+              <Image
+                src="/assets/brand/logo-white.png"
+                alt={company.shortName}
+                width={180}
+                height={60}
+                className="h-9 w-auto"
+              />
             </Link>
             <button
               type="button"
@@ -271,18 +287,16 @@ export default function Header() {
 
           <nav className="mt-6 flex h-[calc(80%-220px)] flex-col gap-3 overflow-auto text-white">
             {navigation.map((item) => (
-              <NavLink
+              <Link
                 key={item.href}
-                to={item.href}
+                href={item.href}
                 onClick={() => setIsOpen(false)}
-                className={({ isActive }) =>
-                  `rounded-2xl px-4 py-3 text-sm font-semibold ${
-                    isActive ? "bg-[#015451] text-white" : "text-white/90"
-                  }`
-                }
+                className={`rounded-2xl px-4 py-3 text-sm font-semibold ${
+                  pathname === item.href ? "bg-[#015451] text-white" : "text-white/90"
+                }`}
               >
                 {item.name}
-              </NavLink>
+              </Link>
             ))}
           </nav>
 

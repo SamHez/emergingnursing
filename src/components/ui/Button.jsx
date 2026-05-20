@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 const variants = {
   primary:
@@ -41,7 +41,7 @@ export default function Button({
 
   if (to) {
     return (
-      <Link to={to} className={sharedClassName} {...props}>
+      <Link href={to} className={sharedClassName} {...props}>
         {children}
       </Link>
     );

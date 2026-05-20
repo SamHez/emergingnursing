@@ -1,4 +1,5 @@
-import { Link } from "react-router-dom";
+import Image from "next/image";
+import Link from "next/link";
 import { company, homeServices, navigation } from "../../data/site";
 import Button from "../ui/Button";
 
@@ -20,22 +21,24 @@ export default function Footer() {
           <div className="flex flex-wrap gap-3">
             <Button to="/referrals">Make a Referral</Button>
             <Button to="/staff-training" variant="ghostDark">
-              Staff Training 
+              Staff Training
             </Button>
           </div>
         </div>
 
         <div className="mt-10 grid gap-10 rounded-[2.2rem] border border-white/12 bg-white/[0.08] p-8 shadow-soft lg:grid-cols-[1.2fr_0.78fr_0.9fr_0.82fr] lg:p-11">
           <div className="space-y-6">
-            <img
+            <Image
               src="/assets/brand/logo-white.png"
               alt={company.shortName}
-              className="h-30 w-auto px-4 py-3"
+              width={220}
+              height={120}
+              className="h-[7.5rem] w-auto px-4 py-3"
             />
             <div className="space-y-3">
               <p className="text-sm font-semibold uppercase tracking-[0.28em] text-teal-200">Person-Centred Care</p>
               <p className="max-w-lg text-sm leading-8 text-white/78">
-                Emerging Nursing and Disability Services supports people through the NDIS 
+                Emerging Nursing and Disability Services supports people through the NDIS
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
@@ -52,13 +55,13 @@ export default function Footer() {
               {navigation.map((item) => (
                 <Link
                   key={item.href}
-                  to={item.href}
+                  href={item.href}
                   className="text-sm text-white/78 hover:text-white"
                 >
                   {item.name}
                 </Link>
               ))}
-              <Link to="/staff-training" className="text-sm text-white/78 hover:text-white">
+              <Link href="/staff-training" className="text-sm text-white/78 hover:text-white">
                 Staff Training
               </Link>
             </div>
@@ -70,7 +73,7 @@ export default function Footer() {
             </p>
             <div className="mt-4 grid gap-3">
               {footerServices.map((item) => (
-                <Link key={item} to="/services" className="text-sm leading-8 text-white/78 hover:text-white">
+                <Link key={item} href="/services" className="text-sm leading-8 text-white/78 hover:text-white">
                   {item}
                 </Link>
               ))}

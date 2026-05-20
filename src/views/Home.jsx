@@ -1,5 +1,8 @@
+"use client";
+
+import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import Badge from "../components/ui/Badge";
 import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
@@ -15,9 +18,7 @@ import {
   homeServices,
   homeSteps,
   homeTrustStrip,
-  pageMeta,
 } from "../data/site";
-import { usePageSeo } from "../hooks/usePageSeo";
 
 function ShieldIcon({ className = "h-5 w-5" }) {
   return (
@@ -108,9 +109,12 @@ const serviceIcons = [HeartPulseIcon, SparkIcon, HomeIcon, ClipboardIcon, Commun
 function HeroSection() {
   return (
     <section className="relative min-h-[22rem] overflow-hidden bg-[#082D36] sm:min-h-[38rem] lg:min-h-[37.5rem]">
-      <img
+      <Image
         src={homeMedia.hero}
         alt="Support worker assisting a participant with guided upper-body movement"
+        fill
+        priority
+        sizes="100vw"
         className="absolute inset-0 h-full w-full object-cover object-center"
       />
       <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(6,30,37,0.76)_0%,rgba(6,30,37,0.66)_30%,rgba(6,30,37,0.52)_58%,rgba(6,30,37,0.4)_100%)]" />
@@ -147,9 +151,9 @@ function HeroSection() {
                 Make a Referral
               </Button>
               <Link
-                to="/services"
+                href="/services"
                 className="inline-flex items-center justify-center px-6 py-3 text-base font-bold text-white"
-                style={{borderBottom: '2px solid #AACD70'}}
+                style={{ borderBottom: "2px solid #AACD70" }}
               >
                 Explore Services
               </Link>
@@ -250,9 +254,12 @@ function AboutSection() {
 
         <Reveal className="order-1 lg:order-2">
           <div className="relative overflow-hidden rounded-[2rem] border border-white/70 shadow-soft">
-            <img
+            <Image
               src={homeMedia.about}
               alt="Support worker assisting a participant at home"
+              width={1200}
+              height={1120}
+              sizes="(min-width: 1024px) 50vw, 100vw"
               className="h-[25rem] w-full object-cover sm:h-[28rem]"
             />
             <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(9,36,43,0.04)_0%,rgba(9,36,43,0.52)_100%)]" />
@@ -312,7 +319,7 @@ function ServicesSection() {
 
                   <div className="mt-6 w-full flex justify-center">
                     <Link
-                      to="/services"
+                      href="/services"
                       className="inline-flex items-center justify-center rounded-full px-6 py-2 text-sm font-semibold bg-white text-ink"
                     >
                       View details
@@ -372,9 +379,12 @@ function ChoiceSection() {
       <div className="site-container grid gap-6 lg:grid-cols-[0.92fr_1.08fr]">
         <Reveal>
           <div className="overflow-hidden rounded-[2rem] border border-white/70 shadow-soft">
-            <img
+            <Image
               src={homeMedia.choice}
               alt="Caregiver supporting a participant using a wheelchair"
+              width={1200}
+              height={1200}
+              sizes="(min-width: 1024px) 50vw, 100vw"
               className="h-[25rem] w-full object-cover sm:h-[30rem]"
             />
           </div>
@@ -561,8 +571,6 @@ function FinalCtaSection() {
 }
 
 export default function Home() {
-  usePageSeo(pageMeta.home);
-
   return (
     <div className="bg-cream">
       <HeroSection />

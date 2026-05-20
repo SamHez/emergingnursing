@@ -1,8 +1,10 @@
+"use client";
+
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { usePathname } from "next/navigation";
 
 export default function RouteLoader() {
-  const location = useLocation();
+  const pathname = usePathname();
   const [visible, setVisible] = useState(false);
   const [progress, setProgress] = useState(0);
 
@@ -29,7 +31,7 @@ export default function RouteLoader() {
       window.clearTimeout(timeoutC);
       window.clearTimeout(timeoutD);
     };
-  }, [location.pathname]);
+  }, [pathname]);
 
   return (
     <div

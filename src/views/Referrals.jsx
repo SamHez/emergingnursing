@@ -1,11 +1,13 @@
+"use client";
+
 import { useMemo, useState } from "react";
 import FeaturePageHero from "../components/sections/FeaturePageHero";
 import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
 import ScrollReveal from "../components/ui/ScrollReveal";
 import SectionHeader from "../components/ui/SectionHeader";
-import { company, pageMedia, pageMeta } from "../data/site";
-import { usePageSeo } from "../hooks/usePageSeo";
+import { company, pageMedia } from "../data/site";
+import { API_BASE_URL } from "../lib/api";
 
 const STORAGE_KEY = "emerging_referrals_demo";
 
@@ -168,7 +170,7 @@ function validateForm(form) {
 }
 
 export default function Referrals() {
-  usePageSeo(pageMeta.referrals);
+  const futureEndpoint = `${API_BASE_URL}/v1/referrals`;
 
   const [form, setForm] = useState(initialForm);
   const [errors, setErrors] = useState({});
@@ -214,7 +216,7 @@ export default function Referrals() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify([payload, ...existing]));
 
     // Connect your API or email service here when backend handling is confirmed.
-    // Example: await fetch("/api/referrals", { method: "POST", body: JSON.stringify(payload) });
+    // Example: await fetch(futureEndpoint, { method: "POST", body: JSON.stringify(payload) });
     // Example: trigger an email workflow using your chosen provider after validation succeeds.
 
     setSubmitted(payload);
@@ -328,7 +330,12 @@ export default function Referrals() {
               </div>
             </div>
           ) : (
-            <form noValidate onSubmit={handleSubmit} className="mt-6 grid gap-8 xl:grid-cols-[1.15fr_0.85fr]">
+            <form
+              noValidate
+              onSubmit={handleSubmit}
+              data-api-endpoint={futureEndpoint}
+              className="mt-6 grid gap-8 xl:grid-cols-[1.15fr_0.85fr]"
+            >
               <div className="xl:col-span-2">
                 <SectionBlock
                   title="Participant Details"

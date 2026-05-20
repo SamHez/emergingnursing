@@ -1,10 +1,10 @@
+import Image from "next/image";
 import FeaturePageHero from "../components/sections/FeaturePageHero";
 import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
 import ScrollReveal from "../components/ui/ScrollReveal";
 import SectionHeader from "../components/ui/SectionHeader";
-import { company, pageMedia, pageMeta } from "../data/site";
-import { usePageSeo } from "../hooks/usePageSeo";
+import { company, pageMedia } from "../data/site";
 
 function LocationIcon() {
   return (
@@ -96,8 +96,6 @@ const approachPoints = [
 ];
 
 export default function About() {
-  usePageSeo(pageMeta.about);
-
   return (
     <div className="bg-cream">
       <FeaturePageHero
@@ -113,9 +111,12 @@ export default function About() {
         <div className="site-container grid gap-10 lg:grid-cols-[0.92fr_1.08fr] lg:items-center">
           <ScrollReveal>
             <div className="relative overflow-hidden rounded-[2.2rem] border border-sand/70 shadow-soft">
-              <img
+              <Image
                 src={pageMedia.aboutStory}
                 alt="Support professional meeting with a participant"
+                width={1200}
+                height={1200}
+                sizes="(min-width: 1024px) 45vw, 100vw"
                 className="h-[25rem] w-full object-cover sm:h-[31rem]"
               />
               <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,46,54,0.06)_0%,rgba(8,46,54,0.5)_100%)]" />
@@ -230,9 +231,12 @@ export default function About() {
 
           <ScrollReveal delay={120}>
             <div className="relative overflow-hidden rounded-[2.2rem] border border-white/70 shadow-soft">
-              <img
+              <Image
                 src={pageMedia.aboutApproach}
                 alt="Support worker assisting a participant in the community"
+                width={1200}
+                height={1200}
+                sizes="(min-width: 1024px) 45vw, 100vw"
                 className="h-[25rem] w-full object-cover sm:h-[31rem]"
               />
               <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,46,54,0.08)_0%,rgba(8,46,54,0.52)_100%)]" />

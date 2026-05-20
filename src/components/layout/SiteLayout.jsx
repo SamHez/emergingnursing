@@ -1,16 +1,18 @@
-import { Outlet, useLocation } from "react-router-dom";
+"use client";
+
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 import Header from "./Header";
 import Footer from "./Footer";
 import RouteLoader from "./RouteLoader";
 
-export default function SiteLayout() {
-  const location = useLocation();
-  const isHome = location.pathname === "/";
+export default function SiteLayout({ children }) {
+  const pathname = usePathname();
+  const isHome = pathname === "/";
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [location.pathname]);
+  }, [pathname]);
 
   return (
     <div className="page-shell">
@@ -23,9 +25,7 @@ export default function SiteLayout() {
         </>
       ) : null}
       <Header />
-      <main>
-        <Outlet />
-      </main>
+      <main>{children}</main>
       <Footer />
     </div>
   );

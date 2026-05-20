@@ -1,12 +1,15 @@
+"use client";
+
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import FeaturePageHero from "../components/sections/FeaturePageHero";
 import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
 import ScrollReveal from "../components/ui/ScrollReveal";
 import SectionHeader from "../components/ui/SectionHeader";
-import { company, pageMedia, pageMeta } from "../data/site";
+import { company, pageMedia } from "../data/site";
 import { trainingModules } from "../data/training";
-import { usePageSeo } from "../hooks/usePageSeo";
+import { API_BASE_URL } from "../lib/api";
 
 const STORAGE_KEY = "emerging_training_records";
 const workflowSteps = [
@@ -84,7 +87,7 @@ function createCertificateId(moduleId) {
 }
 
 export default function StaffTraining() {
-  usePageSeo(pageMeta.training);
+  const futureEndpoint = `${API_BASE_URL}/v1/training/records`;
 
   const [records, setRecords] = useState({});
   const [selectedId, setSelectedId] = useState(trainingModules[0].id);
@@ -452,7 +455,7 @@ export default function StaffTraining() {
                       <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#015451]">
                         Quick quiz
                       </p>
-                      <form onSubmit={submitQuiz} className="mt-6 grid gap-6">
+                      <form onSubmit={submitQuiz} data-api-endpoint={futureEndpoint} className="mt-6 grid gap-6">
                         {selectedModule.quiz.map((item, index) => (
                           <div key={item.question} className="rounded-[1.5rem] bg-[#FBFCFB] px-5 py-5">
                             <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[#015451]">
@@ -610,9 +613,11 @@ export default function StaffTraining() {
                         className="rounded-[2rem] border-[10px] border-[#D5EDE6] bg-[#FBFFFE] p-4 shadow-soft sm:p-6"
                       >
                         <div className="rounded-[1.6rem] border border-[#8DCFC2] px-6 py-8 text-center sm:px-10 sm:py-12">
-                          <img
+                          <Image
                             src="/assets/brand/logo.png"
                             alt={company.shortName}
+                            width={220}
+                            height={88}
                             className="mx-auto h-16 w-auto rounded-[1.2rem] bg-white px-4 py-3"
                           />
                           <p className="mt-6 text-sm font-semibold uppercase tracking-[0.3em] text-[#0C7380]">

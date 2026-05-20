@@ -1,3 +1,4 @@
+import Image from "next/image";
 import ScrollReveal from "../ui/ScrollReveal";
 
 export default function FeaturePageHero({
@@ -10,9 +11,12 @@ export default function FeaturePageHero({
 }) {
   return (
     <section className="relative -mt-[6.1rem] overflow-hidden bg-[#082F39] pt-[7.8rem] sm:-mt-[6.4rem] sm:pt-[8.1rem]">
-      <img
+      <Image
         src={image}
         alt=""
+        fill
+        priority
+        sizes="100vw"
         className="absolute inset-0 h-full w-full object-cover object-center"
       />
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,34,40,0.48)_0%,rgba(7,43,50,0.68)_46%,rgba(7,50,59,0.92)_100%)]" />

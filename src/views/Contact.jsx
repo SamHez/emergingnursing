@@ -1,11 +1,13 @@
+"use client";
+
 import { useState } from "react";
 import FeaturePageHero from "../components/sections/FeaturePageHero";
 import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
 import ScrollReveal from "../components/ui/ScrollReveal";
 import SectionHeader from "../components/ui/SectionHeader";
-import { company, pageMedia, pageMeta } from "../data/site";
-import { usePageSeo } from "../hooks/usePageSeo";
+import { company, pageMedia } from "../data/site";
+import { API_BASE_URL } from "../lib/api";
 
 const STORAGE_KEY = "emerging_contact_demo";
 
@@ -103,7 +105,7 @@ function validateForm(form) {
 }
 
 export default function Contact() {
-  usePageSeo(pageMeta.contact);
+  const futureEndpoint = `${API_BASE_URL}/v1/contact`;
 
   const [form, setForm] = useState(initialForm);
   const [errors, setErrors] = useState({});
@@ -133,7 +135,7 @@ export default function Contact() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify([payload, ...existing]));
 
     // Connect an API or email workflow here when backend handling is confirmed.
-    // Example: await fetch("/api/contact", { method: "POST", body: JSON.stringify(payload) });
+    // Example: await fetch(futureEndpoint, { method: "POST", body: JSON.stringify(payload) });
 
     setSubmitted(payload);
     setForm(initialForm);
@@ -259,7 +261,12 @@ export default function Contact() {
                     </div>
                   </div>
                 ) : (
-                  <form noValidate onSubmit={handleSubmit} className="rounded-[1.8rem] bg-[#F8F4EC] p-6 sm:p-7">
+                  <form
+                    noValidate
+                    onSubmit={handleSubmit}
+                    data-api-endpoint={futureEndpoint}
+                    className="rounded-[1.8rem] bg-[#F8F4EC] p-6 sm:p-7"
+                  >
                     <SectionHeader
                       badge="Contact Form"
                       title="Tell us how we can help."
