@@ -2,6 +2,20 @@
 const nextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
+  async redirects() {
+    return [
+      {
+        source: "/admin",
+        destination: "https://admin.emergingnursing.com",
+        permanent: false,
+      },
+      {
+        source: "/admin/:path*",
+        destination: "https://admin.emergingnursing.com/:path*",
+        permanent: false,
+      },
+    ];
+  },
   async headers() {
     return [
       {
