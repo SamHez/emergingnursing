@@ -4,12 +4,12 @@ export const company = {
   registration: "Registered NDIS Provider in Western Australia",
   phone: "+61 480 220 127",
   phoneHref: "tel:+61480220127",
-  email: "admin@emergingnursing.com",
-  emailHref: "mailto:admin@emergingnursing.com",
-  contactLocations: ["High Wycombe, WA, Australia", "Caversham, WA, Australia"],
-  topBarLocation: "High Wycombe, WA, Australia",
-  locations: ["High Wycombe, WA", "Caversham, WA"],
-  aim: "To enable Australians with disabilities to live as autonomously and independently as possible.",
+  email: "admin@emergingnursing.com.au",
+  emailHref: "mailto:admin@emergingnursing.com.au",
+  contactLocations: ["Shop 26, Cr Beechboro Road North & Bridgeman Drive, Bennett Springs, WA, 6063"],
+  topBarLocation: "26, Cr Beechboro Rd North & Bridgeman Dr, Bennett Springs, WA",
+  locations: ["Shop 26, Cr Beechboro Road North & Bridgeman Drive, Bennett Springs, WA, 6063"],
+  aim: "To enable Australians with disabilities to live as autonomously and independently as possible by providing supportive, person-centred care that promotes meaningful participation in everyday life.",
   mission:
     "To create an environment that improves and promotes the wellbeing of client outcomes and helps clients meet their goals by providing empathy and quality care.",
   vision:
@@ -104,11 +104,16 @@ export const metrics = [
   { label: "Registered provider", value: "NDIS", note: "Western Australia" },
   { label: "Service pillars", value: "4", note: "Clinical, home, community, training" },
   { label: "Service offerings", value: "20+", note: "Across nursing and disability support" },
-  { label: "Local hubs", value: "2", note: "High Wycombe and Caversham" },
+  { label: "Local office", value: "1", note: "Bennett Springs, WA" },
 ];
 
 export const homeMedia = {
   hero: "/assets/media/hero-home-services.jpg",
+  heroSlides: [
+    "/assets/media/hero-home-services.jpg",
+    "/assets/media/hero-home-services-2.jpg",
+    "/assets/media/hero-home-services-3.jpg",
+  ],
   about: "/assets/media/home-about.jpg",
   choice: "/assets/media/home-choice.jpg",
 };
@@ -146,20 +151,19 @@ export const homeHeroCards = [
 
 export const homeTrustStrip = [
   {
-    title: "Registered NDIS Provider",
+    title: "NDIS Provider",
     note: "",
-  },
-  {
-    title: "WA Based Team",
-    note: "",
+    iconAsset: "/assets/brand/ndis-icon.svg",
   },
   {
     title: "Nursing-Led Support",
     note: "",
+    icon: "heartPulse",
   },
   {
     title: "Choice & Control",
     note: "",
+    icon: "clipboardList",
   },
 ];
 
@@ -284,6 +288,6 @@ export const pageMeta = {
   contact: {
     title: "Contact | Emerging Nursing and Disability Services",
     description:
-      "Contact Emerging Nursing and Disability Services in High Wycombe and Caversham, Western Australia.",
+      "Contact Emerging Nursing and Disability Services in Bennett Springs, Western Australia.",
   },
 };

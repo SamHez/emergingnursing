@@ -4,11 +4,15 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "clean": "node ./scripts/clean-next-cache.mjs",
+    "predev": "npm run clean",
     "dev": "next dev",
+    "prebuild": "npm run clean",
     "build": "next build",
     "start": "next start"
   },
   "dependencies": {
+    "lucide-react": "^1.16.0",
     "next": "^14.2.30",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"

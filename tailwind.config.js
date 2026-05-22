@@ -37,8 +37,8 @@ export default {
         sand: "#EBE3D7",
       },
       fontFamily: {
-        sans: ["Sora", "ui-sans-serif", "system-ui", "sans-serif"],
-        display: ["Sora", "ui-sans-serif", "system-ui", "sans-serif"],
+        sans: ['"Host Grotesk"', "ui-sans-serif", "system-ui", "sans-serif"],
+        display: ['"Host Grotesk"', "ui-sans-serif", "system-ui", "sans-serif"],
       },
       boxShadow: {
         soft: "0 20px 60px rgba(11, 45, 54, 0.08)",

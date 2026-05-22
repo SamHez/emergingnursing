@@ -1,16 +1,38 @@
+const CANONICAL_SITE_URL = "https://emergingnursing.com";
+
+function normalizeSiteUrl(url) {
+  if (!url) {
+    return "";
+  }
+
+  return url.replace(/\/+$/, "");
+}
+
 export const siteConfig = {
   siteName: "Emerging Nursing",
   fullName: "Emerging Nursing and Disability Services",
-  siteUrl: process.env.NEXT_PUBLIC_SITE_URL || "https://emergingnursing.com",
+  siteUrl: CANONICAL_SITE_URL,
+  configuredSiteUrl:
+    normalizeSiteUrl(process.env.NEXT_PUBLIC_SITE_URL) || CANONICAL_SITE_URL,
   defaultImage: "/assets/media/hero-home-services.jpg",
+  locale: "en_AU",
 };
+
+export const isProductionIndexable =
+  process.env.VERCEL_ENV === "production" &&
+  siteConfig.configuredSiteUrl === siteConfig.siteUrl;
+
+export function createAbsoluteUrl(path = "/") {
+  const normalizedPath = path === "/" ? "/" : path.replace(/\/$/, "");
+
+  return normalizedPath === "/"
+    ? siteConfig.siteUrl
+    : `${siteConfig.siteUrl}${normalizedPath}`;
+}
 
 export function createPageMetadata(path, { title, description }) {
   const canonicalPath = path === "/" ? "/" : path.replace(/\/$/, "");
-  const url =
-    canonicalPath === "/"
-      ? siteConfig.siteUrl
-      : `${siteConfig.siteUrl}${canonicalPath}`;
+  const url = createAbsoluteUrl(canonicalPath);
 
   return {
     title,
@@ -24,7 +46,7 @@ export function createPageMetadata(path, { title, description }) {
       url,
       siteName: siteConfig.siteName,
       type: "website",
-      locale: "en_AU",
+      locale: siteConfig.locale,
       images: [
         {
           url: siteConfig.defaultImage,
@@ -39,6 +61,14 @@ export function createPageMetadata(path, { title, description }) {
       title,
       description,
       images: [siteConfig.defaultImage],
+    },
+    robots: {
+      index: isProductionIndexable,
+      follow: isProductionIndexable,
+      googleBot: {
+        index: isProductionIndexable,
+        follow: isProductionIndexable,
+      },
     },
   };
 }

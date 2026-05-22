@@ -1,4 +1,4 @@
-import { siteConfig } from "../src/lib/metadata";
+import { createAbsoluteUrl } from "../src/lib/metadata";
 
 const routes = [
   "",
@@ -14,7 +14,7 @@ export default function sitemap() {
   const now = new Date();
 
   return routes.map((route) => ({
-    url: route ? `${siteConfig.siteUrl}${route}` : siteConfig.siteUrl,
+    url: createAbsoluteUrl(route || "/"),
     lastModified: now,
     changeFrequency: route === "" ? "weekly" : "monthly",
     priority: route === "" ? 1 : 0.7,

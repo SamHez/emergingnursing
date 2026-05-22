@@ -7,6 +7,7 @@ export default function SectionHeader({
   align = "left",
   tone = "light",
   className = "",
+  headingId,
 }) {
   const alignment = align === "center" ? "mx-auto text-center" : "";
   const headingTone = tone === "dark" ? "text-white" : "text-ink";
@@ -17,13 +18,14 @@ export default function SectionHeader({
       {badge ? <Badge>{badge}</Badge> : null}
       <div className="space-y-4">
         <h2
-          className={`text-balance text-3xl font-display font-semibold leading-tight sm:text-4xl lg:text-[3.25rem] ${headingTone}`}
-          style={{lineHeight: '50px'}}
+          id={headingId}
+          className={`text-balance text-3xl font-display font-semibold leading-tight sm:text-4xl lg:text-[2.5rem] ${headingTone}`}
+          style={{lineHeight: '40px'}}
         >
           {title}
         </h2>
         {description ? (
-          <p className={`text-balance text-base leading-8 sm:text-lg ${bodyTone}`}>{description}</p>
+          <p className={`text-balance text-base leading-8 sm:text-lg  ${bodyTone}`}>{description}</p>
         ) : null}
       </div>
     </div>

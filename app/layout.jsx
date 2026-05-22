@@ -1,7 +1,14 @@
 import "../src/index.css";
+import Script from "next/script";
 import SiteLayout from "../src/components/layout/SiteLayout";
-import { siteConfig } from "../src/lib/metadata";
+import JsonLd from "../src/components/seo/JsonLd";
+import {
+  isProductionIndexable,
+  siteConfig,
+} from "../src/lib/metadata";
+import { createGlobalStructuredData } from "../src/lib/structuredData";
 
+const globalStructuredData = createGlobalStructuredData();
 export const metadata = {
   metadataBase: new URL(siteConfig.siteUrl),
   title: "Emerging Nursing and Disability Services",
@@ -39,15 +46,34 @@ export const metadata = {
     icon: "/assets/brand/favicon.png",
   },
   robots: {
-    index: true,
-    follow: true,
+    index: isProductionIndexable,
+    follow: isProductionIndexable,
+    googleBot: {
+      index: isProductionIndexable,
+      follow: isProductionIndexable,
+    },
   },
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en-AU">
+      <head>
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-YKDLHJ6MJD"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-YKDLHJ6MJD');
+          `}
+        </Script>
+      </head>
       <body>
+        <JsonLd id="global-structured-data" data={globalStructuredData} />
         <SiteLayout>{children}</SiteLayout>
       </body>
     </html>

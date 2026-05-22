@@ -1,16 +1,9 @@
 import { serviceGroups } from "../../data/site";
 import Button from "../ui/Button";
 import Card from "../ui/Card";
+import AppIcon from "../ui/AppIcon";
 import Reveal from "../ui/Reveal";
 import SectionHeader from "../ui/SectionHeader";
-
-function ChevronIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="m9 6 6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
 
 export default function ServicesPreviewSection() {
   return (
@@ -43,7 +36,7 @@ export default function ServicesPreviewSection() {
                       className="mt-6"
                     >
                       View Services
-                      <ChevronIcon />
+                      <AppIcon name="chevronRight" className="h-5 w-5" strokeWidth={2} />
                     </Button>
                   </div>
 

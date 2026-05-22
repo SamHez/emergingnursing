@@ -1,15 +1,18 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { cloneElement, isValidElement, useMemo, useState } from "react";
 import FeaturePageHero from "../components/sections/FeaturePageHero";
+import AppIcon from "../components/ui/AppIcon";
 import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
 import ScrollReveal from "../components/ui/ScrollReveal";
 import SectionHeader from "../components/ui/SectionHeader";
 import { company, pageMedia } from "../data/site";
-import { API_BASE_URL } from "../lib/api";
-
-const STORAGE_KEY = "emerging_referrals_demo";
+import {
+  PUBLIC_API_ENDPOINTS,
+  apiPostJson,
+  mapApiErrors,
+} from "../lib/api";
 
 const supportOptions = [
   "Nursing Support",
@@ -28,6 +31,45 @@ const nextSteps = [
   "We contact you for an initial conversation",
   "We arrange an initial meeting",
   "We prepare a personalised support plan",
+];
+
+const formSteps = [
+  {
+    key: "participant",
+    number: "01",
+    title: "Participant Details",
+    description: "Who the referral is for and how we can make contact.",
+    fields: [
+      "participantName",
+      "dateOfBirth",
+      "participantPhone",
+      "participantEmail",
+      "address",
+      "ndisNumber",
+      "preferredContactMethod",
+    ],
+  },
+  {
+    key: "referrer",
+    number: "02",
+    title: "Referrer Details",
+    description: "Who is making the referral and how they are connected.",
+    fields: ["referrerName", "relationship", "referrerPhone", "referrerEmail"],
+  },
+  {
+    key: "support",
+    number: "03",
+    title: "Support & Plan Details",
+    description: "Support required, goals, timeframe, and NDIS plan information.",
+    fields: [
+      "supportRequired",
+      "supportNeeds",
+      "goals",
+      "preferredStartDate",
+      "urgency",
+      "planManagement",
+    ],
+  },
 ];
 
 const initialForm = {
@@ -49,37 +91,7 @@ const initialForm = {
   preferredStartDate: "",
   urgency: "Standard",
   planManagement: "",
-  consent: false,
 };
-
-function PhoneIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9">
-      <path
-        d="M6.8 4h2.4a1 1 0 0 1 1 .82l.42 2.5a1 1 0 0 1-.29.88L8.8 9.74a13 13 0 0 0 5.46 5.46l1.54-1.53a1 1 0 0 1 .88-.29l2.5.42a1 1 0 0 1 .82 1v2.4a1 1 0 0 1-.95 1A15.5 15.5 0 0 1 5.8 4.95 1 1 0 0 1 6.8 4Z"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function MailIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9">
-      <path d="M4 7.5h16v9A1.5 1.5 0 0 1 18.5 18h-13A1.5 1.5 0 0 1 4 16.5v-9Z" />
-      <path d="m5 8 7 5 7-5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function CheckIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.2">
-      <path d="m5 12 4 4L19 6" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
 
 function SectionBlock({ title, description, children }) {
   return (
@@ -95,6 +107,18 @@ function SectionBlock({ title, description, children }) {
 
 function Field({ label, name, error, required = false, children }) {
   const errorId = `${name}-error`;
+  const control = isValidElement(children)
+    ? cloneElement(children, {
+        ...children.props,
+        "aria-invalid": children.props["aria-invalid"] ?? Boolean(error),
+        "aria-describedby": [
+          children.props["aria-describedby"],
+          error ? errorId : null,
+        ]
+          .filter(Boolean)
+          .join(" ") || undefined,
+      })
+    : children;
 
   return (
     <div className="space-y-2">
@@ -102,7 +126,7 @@ function Field({ label, name, error, required = false, children }) {
         {label}
         {required ? <span className="ml-1 text-[#015451]">*</span> : null}
       </label>
-      {children}
+      {control}
       {error ? (
         <p id={errorId} className="text-sm font-medium text-rose-700">
           {error}
@@ -162,25 +186,24 @@ function validateForm(form) {
     errors.planManagement = "Please choose the NDIS plan management type.";
   }
 
-  if (!form.consent) {
-    errors.consent = "Consent is required before submitting a referral.";
-  }
-
   return errors;
 }
 
 export default function Referrals() {
-  const futureEndpoint = `${API_BASE_URL}/v1/referrals`;
-
   const [form, setForm] = useState(initialForm);
   const [errors, setErrors] = useState({});
+  const [currentStep, setCurrentStep] = useState(0);
+  const [submitting, setSubmitting] = useState(false);
+  const [submissionError, setSubmissionError] = useState("");
   const [submitted, setSubmitted] = useState(null);
 
   const supportSummary = useMemo(() => form.supportRequired.join(", "), [form.supportRequired]);
+  const activeStep = formSteps[currentStep];
 
   function updateField(name, value) {
     setForm((current) => ({ ...current, [name]: value }));
     setErrors((current) => ({ ...current, [name]: undefined }));
+    setSubmissionError("");
   }
 
   function toggleSupport(option) {
@@ -196,7 +219,31 @@ export default function Referrals() {
     setErrors((current) => ({ ...current, supportRequired: undefined }));
   }
 
-  function handleSubmit(event) {
+  function getStepErrors(stepIndex) {
+    const allErrors = validateForm(form);
+    const stepFields = new Set(formSteps[stepIndex].fields);
+
+    return Object.fromEntries(
+      Object.entries(allErrors).filter(([field]) => stepFields.has(field)),
+    );
+  }
+
+  function handleNextStep() {
+    const stepErrors = getStepErrors(currentStep);
+
+    if (Object.keys(stepErrors).length > 0) {
+      setErrors((current) => ({ ...current, ...stepErrors }));
+      return;
+    }
+
+    setCurrentStep((step) => Math.min(step + 1, formSteps.length - 1));
+  }
+
+  function handlePreviousStep() {
+    setCurrentStep((step) => Math.max(step - 1, 0));
+  }
+
+  async function handleSubmit(event) {
     event.preventDefault();
 
     const nextErrors = validateForm(form);
@@ -206,22 +253,61 @@ export default function Referrals() {
       return;
     }
 
+    setSubmitting(true);
+    setSubmissionError("");
+
     const payload = {
       ...form,
-      submittedAt: new Date().toISOString(),
-      supportSummary,
+      participantName: form.participantName.trim(),
+      participantPhone: form.participantPhone.trim(),
+      participantEmail: form.participantEmail.trim(),
+      address: form.address.trim(),
+      ndisNumber: form.ndisNumber.trim(),
+      referrerName: form.referrerName.trim(),
+      relationship: form.relationship.trim(),
+      organisation: form.organisation.trim(),
+      referrerPhone: form.referrerPhone.trim(),
+      referrerEmail: form.referrerEmail.trim(),
+      supportNeeds: form.supportNeeds.trim(),
+      goals: form.goals.trim(),
     };
 
-    const existing = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-    localStorage.setItem(STORAGE_KEY, JSON.stringify([payload, ...existing]));
+    try {
+      await apiPostJson(PUBLIC_API_ENDPOINTS.referrals, payload);
 
-    // Connect your API or email service here when backend handling is confirmed.
-    // Example: await fetch(futureEndpoint, { method: "POST", body: JSON.stringify(payload) });
-    // Example: trigger an email workflow using your chosen provider after validation succeeds.
+      setSubmitted({
+        participantName: payload.participantName,
+        referrerName: payload.referrerName,
+        supportSummary,
+        urgency: payload.urgency,
+      });
+      setForm(initialForm);
+      setErrors({});
+      setCurrentStep(0);
+    } catch (error) {
+      const fieldErrors = mapApiErrors(error.errors, {
+        participant_name: "participantName",
+        participant_email: "participantEmail",
+        participant_phone: "participantPhone",
+        referrer_name: "referrerName",
+        referrer_email: "referrerEmail",
+        referrer_phone: "referrerPhone",
+        relationship_to_participant: "relationship",
+        ndis_number: "ndisNumber",
+        preferred_contact_method: "preferredContactMethod",
+        support_required: "supportRequired",
+      });
 
-    setSubmitted(payload);
-    setForm(initialForm);
-    setErrors({});
+      if (Object.keys(fieldErrors).length > 0) {
+        setErrors(fieldErrors);
+      }
+
+      setSubmissionError(
+        error.message || "We could not submit the referral right now. Please try again.",
+      );
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -246,6 +332,7 @@ export default function Referrals() {
                     badge="Referrals"
                     title="Referral Form"
                     description="Emerging Nursing and Disability Services works with participants, families, carers, support coordinators, and plan managers to arrange suitable NDIS supports."
+                    
                   />
                 </div>
               </ScrollReveal>
@@ -276,15 +363,18 @@ export default function Referrals() {
             <div className="mt-6 grid gap-8 xl:grid-cols-[1.15fr_0.85fr]">
               <div className="grid gap-6">
                 <ScrollReveal>
-                  <div className="rounded-[1.8rem] bg-[#0F4C4B] px-6 py-8 text-white sm:px-8">
+                  <div
+                    role="status"
+                    aria-live="polite"
+                    className="rounded-[1.8rem] bg-[#0F4C4B] px-6 py-8 text-white sm:px-8"
+                  >
                     <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/12 text-teal-100">
-                      <CheckIcon />
+                      <AppIcon name="check" className="h-4 w-4" strokeWidth={2.2} />
                     </div>
                     <h2 className="mt-5 text-2xl font-bold sm:text-3xl">Referral submitted</h2>
                     <p className="mt-4 max-w-2xl text-sm leading-7 text-white/80 sm:text-base">
-                      Thank you. This demo submission has been saved locally for review and our team
-                      would next contact {submitted.referrerName || submitted.participantName} to
-                      discuss the referral.
+                      Thank you. Our intake team has received this referral and will contact{" "}
+                      {submitted.referrerName || submitted.participantName} to discuss the next step.
                     </p>
                     <div className="mt-6 rounded-[1.5rem] bg-white/10 px-5 py-5 text-sm leading-7 text-white/84">
                       <p>
@@ -333,115 +423,157 @@ export default function Referrals() {
             <form
               noValidate
               onSubmit={handleSubmit}
-              data-api-endpoint={futureEndpoint}
+              data-api-endpoint={PUBLIC_API_ENDPOINTS.referrals}
               className="mt-6 grid gap-8 xl:grid-cols-[1.15fr_0.85fr]"
             >
               <div className="xl:col-span-2">
-                <SectionBlock
-                  title="Participant Details"
-                  description="Basic participant information helps us understand who the referral is for and how to make contact."
-                >
-                  <div className="grid gap-5 sm:grid-cols-2">
-                    <Field label="Participant full name" name="participantName" error={errors.participantName} required>
-                      <input
-                        id="participantName"
-                        name="participantName"
-                        type="text"
-                        value={form.participantName}
-                        onChange={(event) => updateField("participantName", event.target.value)}
-                        className={inputClasses(Boolean(errors.participantName))}
-                        aria-invalid={Boolean(errors.participantName)}
-                      />
-                    </Field>
-                    <Field label="Date of birth" name="dateOfBirth" error={errors.dateOfBirth} required>
-                      <input
-                        id="dateOfBirth"
-                        name="dateOfBirth"
-                        type="date"
-                        value={form.dateOfBirth}
-                        onChange={(event) => updateField("dateOfBirth", event.target.value)}
-                        className={inputClasses(Boolean(errors.dateOfBirth))}
-                        aria-invalid={Boolean(errors.dateOfBirth)}
-                      />
-                    </Field>
-                    <Field label="Phone" name="participantPhone" error={errors.participantPhone} required>
-                      <input
-                        id="participantPhone"
-                        name="participantPhone"
-                        type="tel"
-                        value={form.participantPhone}
-                        onChange={(event) => updateField("participantPhone", event.target.value)}
-                        className={inputClasses(Boolean(errors.participantPhone))}
-                        aria-invalid={Boolean(errors.participantPhone)}
-                      />
-                    </Field>
-                    <Field label="Email" name="participantEmail" error={errors.participantEmail} required>
-                      <input
-                        id="participantEmail"
-                        name="participantEmail"
-                        type="email"
-                        value={form.participantEmail}
-                        onChange={(event) => updateField("participantEmail", event.target.value)}
-                        className={inputClasses(Boolean(errors.participantEmail))}
-                        aria-invalid={Boolean(errors.participantEmail)}
-                      />
-                    </Field>
-                    <Field label="Address/suburb" name="address" error={errors.address} required>
-                      <input
-                        id="address"
-                        name="address"
-                        type="text"
-                        value={form.address}
-                        onChange={(event) => updateField("address", event.target.value)}
-                        className={inputClasses(Boolean(errors.address))}
-                        aria-invalid={Boolean(errors.address)}
-                      />
-                    </Field>
-                    <Field label="NDIS number" name="ndisNumber" error={errors.ndisNumber} required>
-                      <input
-                        id="ndisNumber"
-                        name="ndisNumber"
-                        type="text"
-                        value={form.ndisNumber}
-                        onChange={(event) => updateField("ndisNumber", event.target.value)}
-                        className={inputClasses(Boolean(errors.ndisNumber))}
-                        aria-invalid={Boolean(errors.ndisNumber)}
-                      />
-                    </Field>
-                  </div>
+                <div className="rounded-[2rem] border border-white/45 bg-white/68 p-4 shadow-soft sm:p-5">
+                  <div className="grid gap-3 lg:grid-cols-3">
+                    {formSteps.map((step, index) => {
+                      const isActive = index === currentStep;
+                      const isCompleted = index < currentStep;
 
-                  <div className="mt-5">
-                    <Field
-                      label="Preferred contact method"
-                      name="preferredContactMethod"
-                      error={errors.preferredContactMethod}
-                      required
-                    >
-                      <select
-                        id="preferredContactMethod"
-                        name="preferredContactMethod"
-                        value={form.preferredContactMethod}
-                        onChange={(event) => updateField("preferredContactMethod", event.target.value)}
-                        className={inputClasses(Boolean(errors.preferredContactMethod))}
-                        aria-invalid={Boolean(errors.preferredContactMethod)}
-                      >
-                        <option value="">Select one</option>
-                        <option value="Phone">Phone</option>
-                        <option value="Email">Email</option>
-                        <option value="Either">Either</option>
-                      </select>
-                    </Field>
+                      return (
+                        <button
+                          key={step.key}
+                          type="button"
+                          onClick={() => {
+                            if (index <= currentStep) {
+                              setCurrentStep(index);
+                            }
+                          }}
+                          className={`rounded-[1.5rem] border px-5 py-4 text-left transition ${
+                            isActive
+                              ? "border-[#0C7380] bg-[linear-gradient(145deg,#0F4C4B_0%,#0D6761_100%)] text-white shadow-[0_22px_48px_rgba(10,69,67,0.12)]"
+                              : isCompleted
+                                ? "border-[#BDE6DF] bg-[#EAF8F7] text-[#0B2D36]"
+                                : "border-white/70 bg-white text-ink/72"
+                          }`}
+                        >
+                          <div className="flex items-center justify-between gap-3">
+                            <span className={`text-xs font-semibold uppercase tracking-[0.26em] ${isActive ? "text-white/70" : "text-[#015451]"}`}>
+                              Step {step.number}
+                            </span>
+                            {isCompleted ? (
+                              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/14 text-current">
+                                <AppIcon name="check" className="h-4 w-4" strokeWidth={2.3} />
+                              </span>
+                            ) : null}
+                          </div>
+                          <p className="mt-3 text-lg font-bold">{step.title}</p>
+                          <p className={`mt-2 text-sm leading-6 ${isActive ? "text-white/78" : "text-ink/62"}`}>
+                            {step.description}
+                          </p>
+                        </button>
+                      );
+                    })}
                   </div>
-                </SectionBlock>
+                </div>
               </div>
 
               <div className="xl:col-span-2">
-                <ScrollReveal>
-                  <div className="rounded-[2.2rem] border border-white/45 bg-white/62 p-4 shadow-soft sm:p-5">
-                    <SectionBlock
-                      title="Referrer Details"
-                      description="Tell us who is making the referral and how they are connected to the participant."
-                    >
+                <div className="rounded-[2.2rem] border border-white/45 bg-white/62 p-4 shadow-soft sm:p-5">
+                  <SectionBlock
+                    title={activeStep.title}
+                    description={activeStep.description}
+                  >
+                    {currentStep === 0 ? (
+                      <>
+                        <div className="grid gap-5 sm:grid-cols-2">
+                          <Field label="Participant full name" name="participantName" error={errors.participantName} required>
+                            <input
+                              id="participantName"
+                              name="participantName"
+                              type="text"
+                              value={form.participantName}
+                              onChange={(event) => updateField("participantName", event.target.value)}
+                              className={inputClasses(Boolean(errors.participantName))}
+                              aria-invalid={Boolean(errors.participantName)}
+                            />
+                          </Field>
+                          <Field label="Date of birth" name="dateOfBirth" error={errors.dateOfBirth} required>
+                            <input
+                              id="dateOfBirth"
+                              name="dateOfBirth"
+                              type="date"
+                              value={form.dateOfBirth}
+                              onChange={(event) => updateField("dateOfBirth", event.target.value)}
+                              className={inputClasses(Boolean(errors.dateOfBirth))}
+                              aria-invalid={Boolean(errors.dateOfBirth)}
+                            />
+                          </Field>
+                          <Field label="Phone" name="participantPhone" error={errors.participantPhone} required>
+                            <input
+                              id="participantPhone"
+                              name="participantPhone"
+                              type="tel"
+                              value={form.participantPhone}
+                              onChange={(event) => updateField("participantPhone", event.target.value)}
+                              className={inputClasses(Boolean(errors.participantPhone))}
+                              aria-invalid={Boolean(errors.participantPhone)}
+                            />
+                          </Field>
+                          <Field label="Email" name="participantEmail" error={errors.participantEmail} required>
+                            <input
+                              id="participantEmail"
+                              name="participantEmail"
+                              type="email"
+                              value={form.participantEmail}
+                              onChange={(event) => updateField("participantEmail", event.target.value)}
+                              className={inputClasses(Boolean(errors.participantEmail))}
+                              aria-invalid={Boolean(errors.participantEmail)}
+                            />
+                          </Field>
+                          <Field label="Address/suburb" name="address" error={errors.address} required>
+                            <input
+                              id="address"
+                              name="address"
+                              type="text"
+                              value={form.address}
+                              onChange={(event) => updateField("address", event.target.value)}
+                              className={inputClasses(Boolean(errors.address))}
+                              aria-invalid={Boolean(errors.address)}
+                            />
+                          </Field>
+                          <Field label="NDIS number" name="ndisNumber" error={errors.ndisNumber} required>
+                            <input
+                              id="ndisNumber"
+                              name="ndisNumber"
+                              type="text"
+                              value={form.ndisNumber}
+                              onChange={(event) => updateField("ndisNumber", event.target.value)}
+                              className={inputClasses(Boolean(errors.ndisNumber))}
+                              aria-invalid={Boolean(errors.ndisNumber)}
+                            />
+                          </Field>
+                        </div>
+
+                        <div className="mt-5">
+                          <Field
+                            label="Preferred contact method"
+                            name="preferredContactMethod"
+                            error={errors.preferredContactMethod}
+                            required
+                          >
+                            <select
+                              id="preferredContactMethod"
+                              name="preferredContactMethod"
+                              value={form.preferredContactMethod}
+                              onChange={(event) => updateField("preferredContactMethod", event.target.value)}
+                              className={inputClasses(Boolean(errors.preferredContactMethod))}
+                              aria-invalid={Boolean(errors.preferredContactMethod)}
+                            >
+                              <option value="">Select one</option>
+                              <option value="Phone">Phone</option>
+                              <option value="Email">Email</option>
+                              <option value="Either">Either</option>
+                            </select>
+                          </Field>
+                        </div>
+                      </>
+                    ) : null}
+
+                    {currentStep === 1 ? (
                       <div className="grid gap-5 sm:grid-cols-2">
                         <Field label="Referrer full name" name="referrerName" error={errors.referrerName} required>
                           <input
@@ -501,46 +633,53 @@ export default function Referrals() {
                           </Field>
                         </div>
                       </div>
-                    </SectionBlock>
+                    ) : null}
 
-                    <SectionBlock
-                      title="Support Required"
-                      description="Select the areas where support may be required."
-                    >
-                      <div className="grid gap-3 sm:grid-cols-2">
-                        {supportOptions.map((option) => {
-                          const checked = form.supportRequired.includes(option);
-
-                          return (
-                            <label
-                              key={option}
-                              className={`flex items-center gap-3 rounded-[1.1rem] border px-4 py-4 text-sm font-medium transition ${
-                                checked
-                                  ? "border-[#0C7380] bg-[#EAF8F7] text-[#015451]"
-                                  : "border-sand/90 bg-white text-ink"
-                              }`}
+                    {currentStep === 2 ? (
+                      <div className="grid gap-8">
+                        <div>
+                          <fieldset>
+                            <legend className="text-sm font-semibold text-ink">
+                              Support required <span className="ml-1 text-[#015451]">*</span>
+                            </legend>
+                            <div
+                              className="mt-4 grid gap-3 sm:grid-cols-2"
+                              aria-describedby={errors.supportRequired ? "supportRequired-error" : undefined}
                             >
-                              <input
-                                type="checkbox"
-                                checked={checked}
-                                onChange={() => toggleSupport(option)}
-                                className="h-4 w-4 rounded border-sand text-[#0C7380] focus:ring-teal-200"
-                              />
-                              <span>{option}</span>
-                            </label>
-                          );
-                        })}
-                      </div>
-                      {errors.supportRequired ? (
-                        <p className="mt-3 text-sm font-medium text-rose-700">{errors.supportRequired}</p>
-                      ) : null}
-                    </SectionBlock>
+                              {supportOptions.map((option) => {
+                                const checked = form.supportRequired.includes(option);
 
-                    <SectionBlock
-                      title="Support Details"
-                      description="Help us understand the participant’s current needs, goals, and preferred timeframe."
-                    >
-                      <div className="grid gap-5">
+                                return (
+                                  <label
+                                    key={option}
+                                    className={`flex items-center gap-3 rounded-[1.1rem] border px-4 py-4 text-sm font-medium transition ${
+                                      checked
+                                        ? "border-[#0C7380] bg-[#EAF8F7] text-[#015451]"
+                                        : "border-sand/90 bg-white text-ink"
+                                    }`}
+                                  >
+                                    <input
+                                      type="checkbox"
+                                      checked={checked}
+                                      onChange={() => toggleSupport(option)}
+                                      className="h-4 w-4 rounded border-sand text-[#0C7380] focus:ring-teal-200"
+                                    />
+                                    <span>{option}</span>
+                                  </label>
+                                );
+                              })}
+                            </div>
+                          </fieldset>
+                          {errors.supportRequired ? (
+                            <p
+                              id="supportRequired-error"
+                              className="mt-3 text-sm font-medium text-rose-700"
+                            >
+                              {errors.supportRequired}
+                            </p>
+                          ) : null}
+                        </div>
+
                         <Field label="Brief description of support needs" name="supportNeeds" error={errors.supportNeeds} required>
                           <textarea
                             id="supportNeeds"
@@ -563,6 +702,7 @@ export default function Referrals() {
                             aria-invalid={Boolean(errors.goals)}
                           />
                         </Field>
+
                         <div className="grid gap-5 sm:grid-cols-2">
                           <Field label="Preferred start date" name="preferredStartDate" error={errors.preferredStartDate} required>
                             <input
@@ -590,69 +730,109 @@ export default function Referrals() {
                             </select>
                           </Field>
                         </div>
-                      </div>
-                    </SectionBlock>
 
-                    <SectionBlock
-                      title="NDIS Plan Details"
-                      description="Tell us how the participant’s plan is currently managed."
-                    >
-                      <div className="grid gap-3 sm:grid-cols-2">
-                        {["Plan managed", "Self managed", "NDIA managed", "Unsure"].map((option) => (
-                          <label
-                            key={option}
-                            className={`flex items-center gap-3 rounded-[1.1rem] border px-4 py-4 text-sm font-medium transition ${
-                              form.planManagement === option
-                                ? "border-[#0C7380] bg-[#EAF8F7] text-[#015451]"
-                                : "border-sand/90 bg-white text-ink"
-                            }`}
+                        <div>
+                          <fieldset>
+                            <legend className="text-sm font-semibold text-ink">
+                              NDIS plan management <span className="ml-1 text-[#015451]">*</span>
+                            </legend>
+                            <div
+                              className="mt-4 grid gap-3 sm:grid-cols-2"
+                              aria-describedby={errors.planManagement ? "planManagement-error" : undefined}
+                            >
+                              {["Plan managed", "Self managed", "NDIA managed", "Unsure"].map((option) => (
+                                <label
+                                  key={option}
+                                  className={`flex items-center gap-3 rounded-[1.1rem] border px-4 py-4 text-sm font-medium transition ${
+                                    form.planManagement === option
+                                      ? "border-[#0C7380] bg-[#EAF8F7] text-[#015451]"
+                                      : "border-sand/90 bg-white text-ink"
+                                  }`}
+                                >
+                                  <input
+                                    type="radio"
+                                    name="planManagement"
+                                    value={option}
+                                    checked={form.planManagement === option}
+                                    onChange={(event) => updateField("planManagement", event.target.value)}
+                                    className="h-4 w-4 border-sand text-[#0C7380] focus:ring-teal-200"
+                                  />
+                                  <span>{option}</span>
+                                </label>
+                              ))}
+                            </div>
+                          </fieldset>
+                          {errors.planManagement ? (
+                            <p
+                              id="planManagement-error"
+                              className="mt-3 text-sm font-medium text-rose-700"
+                            >
+                              {errors.planManagement}
+                            </p>
+                          ) : null}
+                        </div>
+
+                        <div className="rounded-[1.5rem] border border-[#DDECEA] bg-[#F8FBFA] px-5 py-5">
+                          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#015451]">
+                            Review before submitting
+                          </p>
+                          <div className="mt-4 grid gap-3 text-sm leading-7 text-ink/72 sm:grid-cols-2">
+                            <p><span className="font-semibold text-ink">Participant:</span> {form.participantName || "Not provided yet"}</p>
+                            <p><span className="font-semibold text-ink">Referrer:</span> {form.referrerName || "Not provided yet"}</p>
+                            <p><span className="font-semibold text-ink">Support:</span> {supportSummary || "Not selected yet"}</p>
+                            <p><span className="font-semibold text-ink">Plan management:</span> {form.planManagement || "Not selected yet"}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ) : null}
+
+                    {submissionError ? (
+                      <div
+                        role="alert"
+                        className="mt-6 rounded-[1.2rem] border border-rose-200 bg-rose-50 px-4 py-4 text-sm leading-7 text-rose-800"
+                      >
+                        {submissionError}
+                      </div>
+                    ) : null}
+
+                    <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="text-sm font-medium text-ink/58">
+                        Step {currentStep + 1} of {formSteps.length}
+                      </div>
+                      <div className="flex flex-col gap-3 sm:flex-row">
+                        {currentStep > 0 ? (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="lg"
+                            onClick={handlePreviousStep}
                           >
-                            <input
-                              type="radio"
-                              name="planManagement"
-                              value={option}
-                              checked={form.planManagement === option}
-                              onChange={(event) => updateField("planManagement", event.target.value)}
-                              className="h-4 w-4 border-sand text-[#0C7380] focus:ring-teal-200"
-                            />
-                            <span>{option}</span>
-                          </label>
-                        ))}
+                            Back
+                          </Button>
+                        ) : null}
+                        {currentStep < formSteps.length - 1 ? (
+                          <Button
+                            type="button"
+                            size="lg"
+                            className="justify-center"
+                            onClick={handleNextStep}
+                          >
+                            Continue
+                          </Button>
+                        ) : (
+                          <Button
+                            size="lg"
+                            className="justify-center disabled:cursor-not-allowed disabled:opacity-70"
+                            type="submit"
+                            disabled={submitting}
+                          >
+                            {submitting ? "Submitting..." : "Submit Referral"}
+                          </Button>
+                        )}
                       </div>
-                      {errors.planManagement ? (
-                        <p className="mt-3 text-sm font-medium text-rose-700">{errors.planManagement}</p>
-                      ) : null}
-                    </SectionBlock>
-
-                    <SectionBlock title="Consent">
-                      <label className="flex items-start gap-3 rounded-[1.1rem] border border-sand/90 bg-white px-4 py-4 text-sm text-ink">
-                        <input
-                          type="checkbox"
-                          checked={form.consent}
-                          onChange={(event) => updateField("consent", event.target.checked)}
-                          className="mt-1 h-4 w-4 rounded border-sand text-[#0C7380] focus:ring-teal-200"
-                        />
-                        <span>
-                          I confirm the participant or authorised representative consents to being
-                          contacted about this referral.
-                        </span>
-                      </label>
-                      {errors.consent ? (
-                        <p className="mt-3 text-sm font-medium text-rose-700">{errors.consent}</p>
-                      ) : null}
-                    </SectionBlock>
-
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                      <p className="text-sm leading-7 text-ink/62">
-                        This is a frontend-ready demo form. Submitted entries are stored locally in
-                        your browser for preview purposes only.
-                      </p>
-                      <Button size="lg" className="justify-center" type="submit">
-                        Submit Referral
-                      </Button>
                     </div>
-                  </div>
-                </ScrollReveal>
+                  </SectionBlock>
+                </div>
               </div>
 
               <div className="grid gap-6">
@@ -664,13 +844,13 @@ export default function Referrals() {
                     <div className="mt-6 grid gap-4">
                       <a href={company.phoneHref} className="flex items-center gap-3 rounded-[1.4rem] bg-white/8 px-4 py-4 hover:bg-white/12">
                         <span className="text-teal-200">
-                          <PhoneIcon />
+                          <AppIcon name="phone" className="h-5 w-5" />
                         </span>
                         <span className="text-sm font-semibold">{company.phone}</span>
                       </a>
                       <a href={company.emailHref} className="flex items-center gap-3 rounded-[1.4rem] bg-white/8 px-4 py-4 hover:bg-white/12">
                         <span className="text-teal-200">
-                          <MailIcon />
+                          <AppIcon name="mail" className="h-5 w-5" />
                         </span>
                         <span className="text-sm font-semibold">{company.email}</span>
                       </a>

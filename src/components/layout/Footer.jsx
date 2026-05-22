@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { company, homeServices, navigation } from "../../data/site";
 import Button from "../ui/Button";
+import ScrollToTopButton from "./ScrollToTopButton";
 
 export default function Footer() {
   const footerServices = homeServices.map((item) => item.title);
@@ -14,8 +15,16 @@ export default function Footer() {
             <p className="text-sm font-semibold uppercase tracking-[0.28em] text-teal-200">
               Emerging Nursing, Every Step
             </p>
-            <p className="mt-2 text-lg text-white/84">
-              Registered NDIS Provider in Western Australia
+            <p className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-lg text-white/84">
+              <span>Registered</span>
+              <Image
+                src="/assets/brand/ndis-logo.svg"
+                alt="NDIS"
+                width={96}
+                height={28}
+                className="h-5 w-auto shrink-0"
+              />
+              <span>Provider in Western Australia</span>
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -110,7 +119,9 @@ export default function Footer() {
 
         <div className="mt-6 flex flex-col gap-2 px-1 text-xs text-white/55 sm:flex-row sm:items-center sm:justify-between">
           <p>© 2026 {company.name}. All rights reserved.</p>
-          <p>Built for trusted, accessible NDIS care presentation.</p>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+            <ScrollToTopButton />
+          </div>
         </div>
       </div>
     </footer>

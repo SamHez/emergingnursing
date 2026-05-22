@@ -8,60 +8,33 @@ import Card from "../components/ui/Card";
 import ScrollReveal from "../components/ui/ScrollReveal";
 import SectionHeader from "../components/ui/SectionHeader";
 import { company, pageMedia } from "../data/site";
-import { trainingModules } from "../data/training";
-import { API_BASE_URL } from "../lib/api";
+import { apiGet, apiPostJson, buildPublicApiUrl, mapApiErrors, PUBLIC_API_ENDPOINTS } from "../lib/api";
 
-const STORAGE_KEY = "emerging_training_records";
-const workflowSteps = [
-  {
-    id: 1,
-    label: "Select module",
-    description: "Pick the training topic to review.",
-  },
-  {
-    id: 2,
-    label: "Complete quiz",
-    description: "Answer the quick knowledge check.",
-  },
-  {
-    id: 3,
-    label: "Get certificate",
-    description: "Generate or print the completion record.",
-  },
-];
+const signupInitialState = {
+  full_name: "",
+  email: "",
+  phone: "",
+  organisation: "",
+  role_position: "",
+  course_id: "",
+  preferred_training_date: "",
+  notes: "",
+};
 
-function BookIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9">
-      <path d="M6 4.5h10.5A1.5 1.5 0 0 1 18 6v13.5H7.5A1.5 1.5 0 0 0 6 21V4.5Z" />
-      <path d="M6 18h12" strokeLinecap="round" />
-      <path d="M9 8h6M9 11h6" strokeLinecap="round" />
-    </svg>
-  );
-}
+const certificateInitialState = {
+  email: "",
+  certificate_number: "",
+};
 
-function CheckIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.2">
-      <path d="m5 12 4 4L19 6" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function ClockIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.9">
-      <circle cx="12" cy="12" r="8" />
-      <path d="M12 8v4l2.5 1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function Field({ label, children }) {
+function Field({ label, htmlFor, error, hint, children }) {
   return (
     <div className="space-y-2">
-      <label className="block text-sm font-semibold text-ink">{label}</label>
+      <label htmlFor={htmlFor} className="block text-sm font-semibold text-ink">
+        {label}
+      </label>
       {children}
+      {hint ? <p className="text-sm text-ink/58">{hint}</p> : null}
+      {error ? <p className="text-sm font-medium text-rose-600">{error}</p> : null}
     </div>
   );
 }
@@ -75,628 +48,544 @@ function inputClasses(hasError) {
 }
 
 function formatDate(date) {
+  const timestamp = Date.parse(date);
+
+  if (Number.isNaN(timestamp)) {
+    return date;
+  }
+
   return new Intl.DateTimeFormat("en-AU", {
     year: "numeric",
     month: "long",
     day: "numeric",
-  }).format(new Date(date));
+  }).format(new Date(timestamp));
 }
 
-function createCertificateId(moduleId) {
-  return `ENDS-${moduleId.toUpperCase().slice(0, 4)}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
+function validateSignup(form) {
+  const errors = {};
+
+  if (!form.full_name.trim()) {
+    errors.full_name = "Full name is required.";
+  }
+
+  if (!form.email.trim()) {
+    errors.email = "Email address is required.";
+  }
+
+  if (!form.phone.trim()) {
+    errors.phone = "Phone number is required.";
+  }
+
+  if (!form.course_id) {
+    errors.course_id = "Please select a course.";
+  }
+
+  return errors;
+}
+
+function validateCertificateLookup(form) {
+  const errors = {};
+
+  if (!form.email.trim()) {
+    errors.email = "Email address is required.";
+  }
+
+  return errors;
 }
 
 export default function StaffTraining() {
-  const futureEndpoint = `${API_BASE_URL}/v1/training/records`;
-
-  const [records, setRecords] = useState({});
-  const [selectedId, setSelectedId] = useState(trainingModules[0].id);
-  const [answers, setAnswers] = useState({});
-  const [quizResult, setQuizResult] = useState(null);
-  const [step, setStep] = useState(1);
-  const [staffName, setStaffName] = useState("");
-  const [staffNameError, setStaffNameError] = useState("");
-
-  useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
-    setRecords(saved);
-  }, []);
-
-  const selectedModule = useMemo(
-    () => trainingModules.find((module) => module.id === selectedId),
-    [selectedId],
-  );
-  const completionRecords = useMemo(
-    () =>
-      Object.values(records).sort(
-        (a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime(),
-      ),
-    [records],
-  );
-
-  const selectedRecord = selectedModule ? records[selectedModule.id] : null;
-  const canOpenCertificateStep = Boolean(quizResult || selectedRecord);
-  const currentScore = quizResult?.score ?? selectedRecord?.score ?? null;
+  const [activeTab, setActiveTab] = useState("signup");
+  const [courses, setCourses] = useState([]);
+  const [coursesLoading, setCoursesLoading] = useState(true);
+  const [coursesError, setCoursesError] = useState("");
+  const [signupForm, setSignupForm] = useState(signupInitialState);
+  const [signupErrors, setSignupErrors] = useState({});
+  const [signupSubmitting, setSignupSubmitting] = useState(false);
+  const [signupSuccess, setSignupSuccess] = useState("");
+  const [lookupForm, setLookupForm] = useState(certificateInitialState);
+  const [lookupErrors, setLookupErrors] = useState({});
+  const [lookupSubmitting, setLookupSubmitting] = useState(false);
+  const [lookupMessage, setLookupMessage] = useState("");
+  const [certificates, setCertificates] = useState([]);
 
   useEffect(() => {
-    setAnswers({});
-    setQuizResult(null);
-    setStaffName(selectedRecord?.staffName || "");
-    setStaffNameError("");
-  }, [selectedId, selectedRecord?.staffName]);
+    let active = true;
 
-  useEffect(() => {
+    async function loadCourses() {
+      setCoursesLoading(true);
+
+      try {
+        const response = await apiGet(PUBLIC_API_ENDPOINTS.trainingCourses);
+
+        if (!active) {
+          return;
+        }
+
+        setCourses(Array.isArray(response.items) ? response.items : []);
+        setCoursesError("");
+      } catch (error) {
+        if (!active) {
+          return;
+        }
+
+        setCourses([]);
+        setCoursesError(error.message || "Unable to load training courses right now.");
+      } finally {
+        if (active) {
+          setCoursesLoading(false);
+        }
+      }
+    }
+
+    loadCourses();
+
     return () => {
-      document.body.classList.remove("printing-certificate");
+      active = false;
     };
   }, []);
 
-  function moduleStatus(module) {
-    if (records[module.id]?.completedAt) {
-      return "Completed";
-    }
+  const selectedCourse = useMemo(
+    () => courses.find((course) => String(course.id) === String(signupForm.course_id)),
+    [courses, signupForm.course_id],
+  );
 
-    if (selectedId === module.id) {
-      return "In Progress";
-    }
-
-    return "Not Started";
-  }
-
-  function updateAnswer(index, value) {
-    setAnswers((current) => ({ ...current, [index]: Number(value) }));
-  }
-
-  function selectModule(moduleId, nextStep = 1) {
-    setSelectedId(moduleId);
-    setStep(nextStep);
-  }
-
-  function resetWorkflow() {
-    setAnswers({});
-    setQuizResult(null);
-    setStaffName(selectedRecord?.staffName || "");
-    setStaffNameError("");
-    setStep(1);
-  }
-
-  function submitQuiz(event) {
+  async function handleSignupSubmit(event) {
     event.preventDefault();
-    // Allow quiz to complete regardless of answers — treat as passed for demo purposes
-    const score = selectedModule.quiz.reduce((total, item, index) => {
-      return total + (answers[index] === item.answer ? 1 : 0);
-    }, 0);
 
-    const passed = true; // demo: always pass
-
-    setQuizResult({
-      passed,
-      score: score,
-      message: "Quiz recorded. Enter the staff name below to generate the certificate.",
-    });
-    // advance to certificate step
-    setStep(3);
-  }
-
-  function completeModule() {
-    if (!staffName.trim()) {
-      setStaffNameError("Staff name is required to generate a certificate.");
+    if (signupSubmitting) {
       return;
     }
 
-    const existingRecord = records[selectedModule.id];
+    const nextErrors = validateSignup(signupForm);
+    setSignupErrors(nextErrors);
+    setSignupSuccess("");
 
-    const completion = {
-      moduleId: selectedModule.id,
-      moduleTitle: selectedModule.title,
-      staffName: staffName.trim(),
-      completedAt: new Date().toISOString(),
-      certificateId: existingRecord?.certificateId ?? createCertificateId(selectedModule.id),
-      score: quizResult?.score ?? existingRecord?.score ?? selectedModule.passScore,
-      total: existingRecord?.total ?? selectedModule.quiz.length,
-    };
+    if (Object.keys(nextErrors).length > 0) {
+      return;
+    }
 
-    const nextRecords = {
-      ...records,
-      [selectedModule.id]: completion,
-    };
+    setSignupSubmitting(true);
 
-    setRecords(nextRecords);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(nextRecords));
-    setStaffNameError("");
-    setSelectedId(selectedModule.id);
-    setStep(3);
+    try {
+      await apiPostJson(PUBLIC_API_ENDPOINTS.trainingSignup, {
+        ...signupForm,
+        course_id: Number(signupForm.course_id),
+      });
+
+      setSignupSuccess("Thank you. Your staff training signup has been received and our team will be in touch.");
+      setSignupForm(signupInitialState);
+      setSignupErrors({});
+    } catch (error) {
+      setSignupErrors(
+        mapApiErrors(error.errors, {
+          fullName: "full_name",
+          rolePosition: "role_position",
+          preferredTrainingDate: "preferred_training_date",
+        }),
+      );
+      setSignupSuccess("");
+    } finally {
+      setSignupSubmitting(false);
+    }
   }
 
-  function printCertificate() {
-    document.body.classList.add("printing-certificate");
-    window.print();
-    window.setTimeout(() => {
-      document.body.classList.remove("printing-certificate");
-    }, 200);
+  async function handleLookupSubmit(event) {
+    event.preventDefault();
+
+    if (lookupSubmitting) {
+      return;
+    }
+
+    const nextErrors = validateCertificateLookup(lookupForm);
+    setLookupErrors(nextErrors);
+    setLookupMessage("");
+
+    if (Object.keys(nextErrors).length > 0) {
+      return;
+    }
+
+    setLookupSubmitting(true);
+
+    try {
+      const response = await apiPostJson(PUBLIC_API_ENDPOINTS.certificateVerify, lookupForm);
+      const items = Array.isArray(response.items) ? response.items : [];
+      setCertificates(items);
+      setLookupMessage(items.length ? "" : "No certificates were found for that email.");
+    } catch (error) {
+      setCertificates([]);
+      setLookupMessage(
+        error.message ||
+          "We could not find a certificate for that email. Please confirm the email used during training or contact Emerging Nursing.",
+      );
+      setLookupErrors(mapApiErrors(error.errors));
+    } finally {
+      setLookupSubmitting(false);
+    }
   }
 
   return (
     <div className="bg-cream">
       <FeaturePageHero
-        chips={["STAFF TRAINING", "Compliance Demo"]}
-        title="Staff Training & Competency"
-        description="Training resources and completion records to support safe, consistent, person-centred care."
+        chips={["STAFF TRAINING", "Certificates"]}
+        title="Staff Training & Certificate Access"
+        description="Book staff training, keep course participation moving, and help completed participants retrieve their certificate securely."
         note=""
         image={pageMedia.trainingHero}
         actions={
-          <Button href="#training-modules" size="lg">
-            Open Training Workflow
-          </Button>
+          <div className="flex flex-wrap gap-4">
+            <Button href="#staff-training-workflow" size="lg">
+              Sign up for training
+            </Button>
+            <Button href="#staff-training-workflow" variant="secondary" size="lg" onClick={() => setActiveTab("certificate")}>
+              Access certificate
+            </Button>
+          </div>
         }
       />
 
-      <section id="training-modules" className="relative overflow-hidden bg-white py-16 sm:py-20 lg:py-24">
+      <section id="staff-training-workflow" className="relative overflow-hidden bg-white py-16 sm:py-20 lg:py-24">
         <div className="pointer-events-none absolute right-[-8rem] top-6 h-48 w-48 rounded-full bg-teal-100/70" />
         <div className="pointer-events-none absolute left-[-8rem] top-1/3 h-56 w-56 rounded-full bg-[#EAF8F7]" />
         <div className="site-container">
           <ScrollReveal>
             <SectionHeader
-              badge="Training Modules"
-              title="Training Modules"
-              description="Select a module, complete the quiz, and generate the certificate from one guided workflow without jumping to another section."
+              badge="Training Workflow"
+              title="Choose the training action you need"
+              description="Register staff for an upcoming course or locate a certificate using the email used during training."
               align="center"
               className="mx-auto"
             />
           </ScrollReveal>
 
           <ScrollReveal delay={80}>
-            <div className="mt-12 rounded-[2.4rem] border border-sand/80 bg-[#F6FAF9] p-3 shadow-soft">
-              <div className="grid gap-3 lg:grid-cols-3">
-                {workflowSteps.map((item) => {
-                  const isActive = step === item.id;
-                  const isLocked = item.id === 3 && !canOpenCertificateStep;
+            <div className="mx-auto mt-10 flex max-w-3xl flex-wrap justify-center gap-3 rounded-[2rem] border border-sand/80 bg-[#F6FAF9] p-3 shadow-soft">
+              <button
+                type="button"
+                className={`inline-flex min-h-14 items-center justify-center rounded-full px-6 text-sm font-semibold transition ${
+                  activeTab === "signup"
+                    ? "bg-white text-ink shadow-soft"
+                    : "bg-transparent text-ink/65 hover:text-ink"
+                }`}
+                onClick={() => setActiveTab("signup")}
+              >
+                Sign up for staff training
+              </button>
+              <button
+                type="button"
+                className={`inline-flex min-h-14 items-center justify-center rounded-full px-6 text-sm font-semibold transition ${
+                  activeTab === "certificate"
+                    ? "bg-white text-ink shadow-soft"
+                    : "bg-transparent text-ink/65 hover:text-ink"
+                }`}
+                onClick={() => setActiveTab("certificate")}
+              >
+                Access certificate
+              </button>
+            </div>
+          </ScrollReveal>
 
-                  return (
-                    <button
-                      key={item.id}
-                      type="button"
-                      disabled={isLocked}
-                      onClick={() => !isLocked && setStep(item.id)}
-                      className={`rounded-[1.5rem] border px-5 py-5 text-left transition ${
-                        isActive
-                          ? "border-[#0C7380] bg-[#0B3F3E] text-white shadow-soft"
-                          : isLocked
-                            ? "cursor-not-allowed border-transparent bg-white/70 text-ink/38"
-                            : "border-transparent bg-white text-ink hover:border-[#0C7380]/30"
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <span
-                          className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold ${
-                            isActive
-                              ? "bg-white/14 text-white"
-                              : isLocked
-                                ? "bg-sand/60 text-ink/45"
-                                : "bg-[#E8F6F4] text-[#015451]"
-                          }`}
-                        >
-                          {item.id}
-                        </span>
-                        <div>
-                          <p className="text-base font-semibold">{item.label}</p>
-                          <p className={`mt-1 text-sm ${isActive ? "text-white/72" : "text-ink/58"}`}>
-                            {item.description}
-                          </p>
-                        </div>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-
-              <div className="mt-3 rounded-[2rem] bg-white p-5 sm:p-7 lg:p-8">
-                {step === 1 ? (
-                  <div className="grid gap-6">
-                    <div className="rounded-[2rem] bg-[#0B3F3E] px-6 py-7 text-white sm:px-8">
-                      <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
-                        <div className="max-w-3xl">
-                          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#9EE4DA]">
-                            Selected module
-                          </p>
-                          <h2 className="mt-4 text-3xl font-display font-semibold leading-tight sm:text-4xl">
-                            {selectedModule.title}
-                          </h2>
-                          <p className="mt-4 text-sm leading-8 text-white/74">{selectedModule.summary}</p>
-                          <div className="mt-5 flex flex-wrap items-center gap-3 text-sm">
-                            <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 font-semibold text-white">
-                              <ClockIcon />
-                              {selectedModule.duration}
-                            </span>
-                            <span className="inline-flex rounded-full bg-white/10 px-4 py-2 font-semibold text-white">
-                              {moduleStatus(selectedModule)}
-                            </span>
-                            {selectedRecord ? (
-                              <span className="inline-flex items-center gap-2 rounded-full bg-[#DFF5ED] px-4 py-2 font-semibold text-[#0B6D57]">
-                                <CheckIcon />
-                                Completed {formatDate(selectedRecord.completedAt)}
-                              </span>
-                            ) : null}
-                          </div>
-                        </div>
-
-                        <div className="flex flex-wrap gap-3">
-                          <Button onClick={() => setStep(2)} size="lg">
-                            Start quiz
-                          </Button>
-                          {selectedRecord ? (
-                            <Button variant="ghostDark" onClick={() => setStep(3)} size="lg">
-                              View certificate
-                            </Button>
-                          ) : null}
-                          <Button variant="ghostDark" onClick={resetWorkflow} size="lg">
-                            Reset
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                      {trainingModules.map((module) => {
-                        const status = moduleStatus(module);
-                        const active = module.id === selectedId;
-
-                        return (
-                          <button
-                            key={module.id}
-                            type="button"
-                            onClick={() => selectModule(module.id, 1)}
-                            className="h-full w-full text-left"
-                          >
-                            <div
-                              className={`flex h-full flex-col rounded-[1.7rem] border px-5 py-5 transition ${
-                                active
-                                  ? "border-[#0C7380] bg-[#0F4C4B] text-white shadow-soft"
-                                  : "border-sand/80 bg-[#FBFCFB] text-ink hover:border-[#0C7380]/35 hover:bg-white"
-                              }`}
-                            >
-                              <div className="flex items-start justify-between gap-3">
-                                <div
-                                  className={`flex h-11 w-11 items-center justify-center rounded-2xl ${
-                                    active ? "bg-white/12 text-white" : "bg-[#E8F6F4] text-[#015451]"
-                                  }`}
-                                >
-                                  <BookIcon />
-                                </div>
-                                <span
-                                  className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
-                                    active
-                                      ? "bg-white/12 text-white"
-                                      : status === "Completed"
-                                        ? "bg-[#DFF5ED] text-[#0B6D57]"
-                                        : status === "In Progress"
-                                          ? "bg-[#EEF6F5] text-[#015451]"
-                                          : "bg-[#F1F1EE] text-ink/70"
-                                  }`}
-                                >
-                                  {active ? "Selected" : status}
-                                </span>
-                              </div>
-
-                              <h3
-                                className={`mt-5 text-xl font-bold leading-tight ${
-                                  active ? "text-white" : "text-ink"
-                                }`}
-                              >
-                                {module.title}
-                              </h3>
-                              <p className={`mt-3 text-sm leading-7 ${active ? "text-white/76" : "text-ink/66"}`}>
-                                {module.description}
-                              </p>
-
-                              <div className="mt-auto flex items-center justify-between gap-3 pt-5 text-sm">
-                                <span
-                                  className={`inline-flex items-center gap-2 rounded-full px-4 py-2 font-semibold ${
-                                    active ? "bg-white/10 text-white" : "bg-white text-[#015451]"
-                                  }`}
-                                >
-                                  <ClockIcon />
-                                  {module.duration}
-                                </span>
-                                {records[module.id]?.completedAt ? (
-                                  <span className={`inline-flex items-center gap-2 text-xs font-semibold ${
-                                    active ? "text-white/84" : "text-[#0B6D57]"
-                                  }`}>
-                                    <CheckIcon />
-                                    Completed
-                                  </span>
-                                ) : null}
-                              </div>
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                ) : null}
-
-                {step === 2 ? (
-                  <div className="grid gap-6 xl:grid-cols-[0.88fr_1.12fr]">
-                    <Card className="border-sand/80 bg-[#F7FBFA] p-7">
-                      <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#015451]">
-                        Module detail
+          <div className="mt-10 grid gap-8 lg:grid-cols-[1.05fr_minmax(0,0.95fr)]">
+            <ScrollReveal delay={120}>
+              <Card className="rounded-[2.4rem] p-7 sm:p-9">
+                {activeTab === "signup" ? (
+                  <div className="space-y-7">
+                    <div className="space-y-3">
+                      <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#0C7380]">
+                        Staff Training Signup
                       </p>
-                      <h2 className="mt-4 text-3xl font-display font-semibold leading-tight text-ink">
-                        {selectedModule.title}
+                      <h2 className="font-display text-3xl font-semibold text-ink sm:text-4xl">
+                        Register for the next available course
                       </h2>
-                      <p className="mt-4 text-sm leading-8 text-ink/68">{selectedModule.summary}</p>
-                      <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                        <div className="rounded-[1.4rem] bg-white px-4 py-4">
-                          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#0C7380]">
-                            Duration
-                          </p>
-                          <p className="mt-2 text-base font-semibold text-ink">{selectedModule.duration}</p>
-                        </div>
-                        <div className="rounded-[1.4rem] bg-white px-4 py-4">
-                          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#0C7380]">
-                            Pass mark
-                          </p>
-                          <p className="mt-2 text-base font-semibold text-ink">
-                            {selectedModule.passScore}/{selectedModule.quiz.length}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="mt-6 flex flex-wrap gap-3">
-                        <Button variant="ghost" onClick={() => setStep(1)}>
-                          Change module
-                        </Button>
-                        <Button variant="ghost" onClick={resetWorkflow}>
-                          Reset
-                        </Button>
-                      </div>
-                    </Card>
-
-                    <Card className="border-sand/80 bg-white p-8">
-                      <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#015451]">
-                        Quick quiz
+                      <p className="max-w-2xl text-base leading-8 text-ink/68">
+                        Submit a training request for yourself or a team member. 
                       </p>
-                      <form onSubmit={submitQuiz} data-api-endpoint={futureEndpoint} className="mt-6 grid gap-6">
-                        {selectedModule.quiz.map((item, index) => (
-                          <div key={item.question} className="rounded-[1.5rem] bg-[#FBFCFB] px-5 py-5">
-                            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[#015451]">
-                              Question {index + 1}
-                            </p>
-                            <p className="mt-3 text-base font-semibold text-ink">{item.question}</p>
-                            <div className="mt-4 grid gap-3">
-                              {item.options.map((option, optionIndex) => (
-                                <label
-                                  key={option}
-                                  className={`flex items-start gap-3 rounded-[1rem] border px-4 py-4 text-sm ${
-                                    answers[index] === optionIndex
-                                      ? "border-[#0C7380] bg-[#EAF8F7] text-[#015451]"
-                                      : "border-sand/90 bg-white text-ink"
-                                  }`}
-                                >
-                                  <input
-                                    type="radio"
-                                    name={`question-${selectedModule.id}-${index}`}
-                                    checked={answers[index] === optionIndex}
-                                    onChange={() => updateAnswer(index, optionIndex)}
-                                    className="mt-1 h-4 w-4 border-sand text-[#0C7380] focus:ring-teal-200"
-                                  />
-                                  <span>{option}</span>
-                                </label>
-                              ))}
+                    </div>
+
+                    {signupSuccess ? (
+                      <div className="rounded-[1.5rem] border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm font-medium text-emerald-800">
+                        {signupSuccess}
+                      </div>
+                    ) : null}
+
+                    {coursesError ? (
+                      <div className="rounded-[1.5rem] border border-rose-200 bg-rose-50 px-5 py-4 text-sm font-medium text-rose-700">
+                        {coursesError}
+                      </div>
+                    ) : null}
+
+                    {!coursesLoading && courses.length === 0 ? (
+                      <div className="rounded-[1.6rem] border border-sand/80 bg-cream px-5 py-5 text-sm leading-7 text-ink/72">
+                        There are no public training courses available at the moment. Please contact{" "}
+                        <a className="font-semibold text-teal-800" href={company.emailHref}>
+                          {company.email}
+                        </a>{" "}
+                        to register your interest.
+                      </div>
+                    ) : null}
+
+                    <form className="space-y-5" onSubmit={handleSignupSubmit}>
+                      <div className="grid gap-5 sm:grid-cols-2">
+                        <Field label="Full name" htmlFor="training_full_name" error={signupErrors.full_name}>
+                          <input
+                            id="training_full_name"
+                            className={inputClasses(Boolean(signupErrors.full_name))}
+                            value={signupForm.full_name}
+                            onChange={(event) => setSignupForm((current) => ({ ...current, full_name: event.target.value }))}
+                          />
+                        </Field>
+                        <Field label="Email address" htmlFor="training_email" error={signupErrors.email}>
+                          <input
+                            id="training_email"
+                            type="email"
+                            className={inputClasses(Boolean(signupErrors.email))}
+                            value={signupForm.email}
+                            onChange={(event) => setSignupForm((current) => ({ ...current, email: event.target.value }))}
+                          />
+                        </Field>
+                        <Field label="Phone number" htmlFor="training_phone" error={signupErrors.phone}>
+                          <input
+                            id="training_phone"
+                            className={inputClasses(Boolean(signupErrors.phone))}
+                            value={signupForm.phone}
+                            onChange={(event) => setSignupForm((current) => ({ ...current, phone: event.target.value }))}
+                          />
+                        </Field>
+                        <Field label="Organisation / employer" htmlFor="training_organisation" error={signupErrors.organisation}>
+                          <input
+                            id="training_organisation"
+                            className={inputClasses(Boolean(signupErrors.organisation))}
+                            value={signupForm.organisation}
+                            onChange={(event) => setSignupForm((current) => ({ ...current, organisation: event.target.value }))}
+                          />
+                        </Field>
+                        <Field label="Role / position" htmlFor="training_role_position" error={signupErrors.role_position}>
+                          <input
+                            id="training_role_position"
+                            className={inputClasses(Boolean(signupErrors.role_position))}
+                            value={signupForm.role_position}
+                            onChange={(event) => setSignupForm((current) => ({ ...current, role_position: event.target.value }))}
+                          />
+                        </Field>
+                        <Field
+                          label="Course selection"
+                          htmlFor="training_course_id"
+                          error={signupErrors.course_id}
+                          hint={coursesLoading ? "Loading courses..." : undefined}
+                        >
+                          <select
+                            id="training_course_id"
+                            className={inputClasses(Boolean(signupErrors.course_id))}
+                            value={signupForm.course_id}
+                            onChange={(event) => setSignupForm((current) => ({ ...current, course_id: event.target.value }))}
+                            disabled={coursesLoading || courses.length === 0}
+                          >
+                            <option value="">Select a course</option>
+                            {courses.map((course) => (
+                              <option key={course.id} value={course.id}>
+                                {course.title}
+                              </option>
+                            ))}
+                          </select>
+                        </Field>
+                        <Field label="Preferred training date" htmlFor="training_preferred_date" error={signupErrors.preferred_training_date}>
+                          <input
+                            id="training_preferred_date"
+                            type="date"
+                            className={inputClasses(Boolean(signupErrors.preferred_training_date))}
+                            value={signupForm.preferred_training_date}
+                            onChange={(event) => setSignupForm((current) => ({ ...current, preferred_training_date: event.target.value }))}
+                          />
+                        </Field>
+                      </div>
+
+                      <Field label="Notes / message" htmlFor="training_notes" error={signupErrors.notes}>
+                        <textarea
+                          id="training_notes"
+                          rows={5}
+                          className={`${inputClasses(Boolean(signupErrors.notes))} resize-y`}
+                          value={signupForm.notes}
+                          onChange={(event) => setSignupForm((current) => ({ ...current, notes: event.target.value }))}
+                        />
+                      </Field>
+
+                      <div className="flex flex-wrap items-center gap-4">
+                        <Button type="submit" size="lg" disabled={signupSubmitting || coursesLoading || courses.length === 0}>
+                          {signupSubmitting ? "Submitting..." : "Sign up for staff training"}
+                        </Button>
+                        {selectedCourse ? (
+                          <p className="text-sm leading-7 text-ink/65">
+                            Selected course: <span className="font-semibold text-ink">{selectedCourse.title}</span>
+                          </p>
+                        ) : null}
+                      </div>
+                    </form>
+                  </div>
+                ) : (
+                  <div className="space-y-7">
+                    <div className="space-y-3">
+                      <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#0C7380]">
+                        Certificate Access
+                      </p>
+                      <h2 className="font-display text-3xl font-semibold text-ink sm:text-4xl">
+                        Find and download a certificate
+                      </h2>
+                      <p className="max-w-2xl text-base leading-8 text-ink/68">
+                        Enter the email used during training to check whether a certificate is available. If you have the certificate number, add it to narrow the search.
+                      </p>
+                    </div>
+
+                    <form className="space-y-5" onSubmit={handleLookupSubmit}>
+                      <div className="grid gap-5 sm:grid-cols-2">
+                        <Field label="Email address" htmlFor="certificate_email" error={lookupErrors.email}>
+                          <input
+                            id="certificate_email"
+                            type="email"
+                            className={inputClasses(Boolean(lookupErrors.email))}
+                            value={lookupForm.email}
+                            onChange={(event) => setLookupForm((current) => ({ ...current, email: event.target.value }))}
+                          />
+                        </Field>
+                        <Field
+                          label="Certificate number"
+                          htmlFor="certificate_number"
+                          hint="Optional, if you already have the certificate number."
+                          error={lookupErrors.certificate_number}
+                        >
+                          <input
+                            id="certificate_number"
+                            className={inputClasses(Boolean(lookupErrors.certificate_number))}
+                            value={lookupForm.certificate_number}
+                            onChange={(event) => setLookupForm((current) => ({ ...current, certificate_number: event.target.value }))}
+                          />
+                        </Field>
+                      </div>
+
+                      <Button type="submit" size="lg" disabled={lookupSubmitting}>
+                        {lookupSubmitting ? "Searching..." : "Find my certificate"}
+                      </Button>
+                    </form>
+
+                    {lookupMessage ? (
+                      <div className="rounded-[1.5rem] border border-sand/80 bg-cream px-5 py-4 text-sm leading-7 text-ink/72">
+                        {lookupMessage}
+                      </div>
+                    ) : null}
+
+                    {certificates.length > 0 ? (
+                      <div className="space-y-4">
+                        {certificates.map((certificate) => (
+                          <div
+                            key={certificate.id || certificate.certificate_number}
+                            className="rounded-[1.6rem] border border-sand/80 bg-[#F7FAFA] p-5 shadow-soft"
+                          >
+                            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                              <div className="space-y-2">
+                                <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[#0C7380]">
+                                  {certificate.certificate_number}
+                                </p>
+                                <h3 className="font-display text-2xl font-semibold text-ink">
+                                  {certificate.staff_name}
+                                </h3>
+                                <p className="text-sm leading-7 text-ink/68">{certificate.course_title_snapshot || certificate.course_title}</p>
+                                <p className="text-sm leading-7 text-ink/58">
+                                  Completed {formatDate(certificate.completion_date_snapshot || certificate.completion_date)}
+                                </p>
+                              </div>
+
+                              {certificate.public_download_url ? (
+                                <Button href={certificate.public_download_url} size="lg" target="_blank" rel="noreferrer">
+                                  Download certificate
+                                </Button>
+                              ) : null}
                             </div>
                           </div>
                         ))}
-
-                        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                          <p className="text-sm leading-7 text-ink/62">
-                            Pass mark for this module: {selectedModule.passScore} out of{" "}
-                            {selectedModule.quiz.length}.
-                          </p>
-                          <div className="flex flex-wrap gap-3">
-                            <Button type="button" variant="ghost" onClick={() => setStep(1)}>
-                              Back to modules
-                            </Button>
-                            <Button type="submit" size="lg">
-                              Finish quiz
-                            </Button>
-                          </div>
-                        </div>
-                      </form>
-                    </Card>
+                      </div>
+                    ) : null}
                   </div>
-                ) : null}
+                )}
+              </Card>
+            </ScrollReveal>
 
-                {step === 3 ? (
-                  <div className="grid gap-6 xl:grid-cols-[0.88fr_1.12fr]">
-                    <Card className="border-sand/80 bg-white p-7">
-                      <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#015451]">
-                        Completion details
+            <ScrollReveal delay={180}>
+              <div className="space-y-6">
+                <Card tint="teal" className="overflow-hidden rounded-[2.4rem] p-0">
+                  <div className="relative h-72 sm:h-80">
+                    <Image
+                      src={pageMedia.trainingHero}
+                      alt="Emerging Nursing training session"
+                      fill
+                      className="object-cover"
+                      sizes="(min-width: 1024px) 38vw, 100vw"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-teal-950/75 via-teal-900/20 to-transparent" />
+                    <div className="absolute inset-x-0 bottom-0 p-6 text-white sm:p-8">
+                      <p className="text-xs font-semibold uppercase tracking-[0.25em] text-white/72">Course Access</p>
+                      <h3 className="mt-3 font-display text-2xl font-semibold sm:text-[2rem]">
+                        Live training options with secure certificate retrieval
+                      </h3>
+                    </div>
+                  </div>
+                </Card>
+
+                <Card className="rounded-[2.4rem] p-7 sm:p-8">
+                  <div className="space-y-5">
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#0C7380]">
+                        How it works
                       </p>
+                      <h3 className="mt-3 font-display text-2xl font-semibold text-ink">
+                        Clear steps for staff, coordinators, and employers
+                      </h3>
+                    </div>
 
-                      {quizResult ? (
-                        <div
-                          className={`mt-5 rounded-[1.5rem] px-5 py-5 ${
-                            quizResult.passed ? "bg-[#EAF8F7] text-[#015451]" : "bg-[#FFF3F2] text-rose-700"
-                          }`}
-                        >
-                          <p className="text-lg font-bold">
-                            Score: {quizResult.score}/{selectedModule.quiz.length}
-                          </p>
-                          <p className="mt-2 text-sm leading-7">{quizResult.message}</p>
-                        </div>
-                      ) : selectedRecord ? (
-                        <div className="mt-5 rounded-[1.5rem] bg-[#EAF8F7] px-5 py-5 text-[#015451]">
-                          <p className="text-lg font-bold">
-                            Certificate on file: {selectedRecord.score}/{selectedRecord.total}
-                          </p>
-                          <p className="mt-2 text-sm leading-7">
-                            This module already has a stored completion record. You can print it or
-                            update the certificate name below.
-                          </p>
-                        </div>
-                      ) : (
-                        <div className="mt-5 rounded-[1.5rem] bg-[#FBFCFB] px-5 py-5 text-ink/68">
-                          Complete the quiz first to unlock certificate generation for this module.
-                        </div>
-                      )}
-
-                      {quizResult || selectedRecord ? (
-                        <div className="mt-6 grid gap-4">
-                          <Field label="Staff name for certificate">
-                            <input
-                              type="text"
-                              value={staffName}
-                              onChange={(event) => {
-                                setStaffName(event.target.value);
-                                setStaffNameError("");
-                              }}
-                              className={inputClasses(Boolean(staffNameError))}
-                            />
-                          </Field>
-                          {staffNameError ? (
-                            <p className="text-sm font-medium text-rose-700">{staffNameError}</p>
-                          ) : null}
-                          <div className="flex flex-wrap gap-3">
-                            <Button onClick={completeModule} size="lg">
-                              {selectedRecord ? "Update certificate" : "Generate certificate"}
-                            </Button>
-                            <Button variant="ghost" onClick={() => setStep(2)}>
-                              Back to quiz
-                            </Button>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="mt-6">
-                          <Button onClick={() => setStep(2)} size="lg">
-                            Go to quiz
-                          </Button>
-                        </div>
-                      )}
-
-                      <div className="mt-8 border-t border-sand/80 pt-8">
-                        <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#015451]">
-                          Stored completion records
-                        </p>
-                        <div className="mt-5 grid gap-3">
-                          {completionRecords.length > 0 ? (
-                            completionRecords.map((record) => (
-                              <button
-                                key={record.certificateId}
-                                type="button"
-                                onClick={() => selectModule(record.moduleId, 3)}
-                                className={`rounded-[1.4rem] border px-4 py-4 text-left transition ${
-                                  record.moduleId === selectedId
-                                    ? "border-[#0C7380] bg-[#EAF8F7]"
-                                    : "border-sand/90 bg-[#FBFCFB] hover:border-[#0C7380]"
-                                }`}
-                              >
-                                <p className="text-sm font-semibold text-ink">{record.moduleTitle}</p>
-                                <p className="mt-2 text-sm leading-7 text-ink/64">
-                                  {record.staffName} • {formatDate(record.completedAt)}
-                                </p>
-                                <p className="mt-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#0C7380]">
-                                  {record.certificateId}
-                                </p>
-                              </button>
-                            ))
-                          ) : (
-                            <p className="text-sm leading-8 text-ink/66">
-                              Completed modules stored in localStorage will appear here.
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    </Card>
-
-                    {selectedRecord ? (
-                      <div
-                        data-print-certificate
-                        className="rounded-[2rem] border-[10px] border-[#D5EDE6] bg-[#FBFFFE] p-4 shadow-soft sm:p-6"
-                      >
-                        <div className="rounded-[1.6rem] border border-[#8DCFC2] px-6 py-8 text-center sm:px-10 sm:py-12">
-                          <Image
-                            src="/assets/brand/logo.png"
-                            alt={company.shortName}
-                            width={220}
-                            height={88}
-                            className="mx-auto h-16 w-auto rounded-[1.2rem] bg-white px-4 py-3"
-                          />
-                          <p className="mt-6 text-sm font-semibold uppercase tracking-[0.3em] text-[#0C7380]">
-                            Certificate of Completion
-                          </p>
-                          <h2 className="mt-6 text-3xl font-display font-semibold leading-tight text-ink sm:text-4xl">
-                            {selectedRecord.staffName}
-                          </h2>
-                          <p className="mx-auto mt-6 max-w-2xl text-base leading-8 text-ink/72">
-                            This certificate confirms completion of internal training awareness
-                            content.
-                          </p>
-                          <div className="mt-8 grid gap-4 rounded-[1.5rem] bg-[#F4FBF8] px-5 py-5 text-left sm:grid-cols-2">
+                    <div className="space-y-4">
+                      {[
+                        {
+                          title: "Choose the right course",
+                          copy: "Public course options are pulled from the active training catalogue managed inside the admin portal.",
+                        },
+                        {
+                          title: "Complete the signup",
+                          copy: "Training signups are stored securely and appear in the admin records workflow for review and completion.",
+                        },
+                        {
+                          title: "Retrieve the certificate later",
+                          copy: "Once a course is completed and certified, the participant can verify their email and download the stored PDF certificate.",
+                        },
+                      ].map((item, index) => (
+                        <div key={item.title} className="rounded-[1.45rem] border border-sand/80 bg-[#F8FBFB] px-5 py-4">
+                          <div className="flex items-start gap-4">
+                            <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-teal-100 font-semibold text-teal-900">
+                              0{index + 1}
+                            </span>
                             <div>
-                              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#0C7380]">
-                                Module completed
-                              </p>
-                              <p className="mt-2 text-sm font-semibold text-ink">
-                                {selectedRecord.moduleTitle}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#0C7380]">
-                                Completion date
-                              </p>
-                              <p className="mt-2 text-sm font-semibold text-ink">
-                                {formatDate(selectedRecord.completedAt)}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#0C7380]">
-                                Certificate ID
-                              </p>
-                              <p className="mt-2 text-sm font-semibold text-ink">
-                                {selectedRecord.certificateId}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#0C7380]">
-                                Result
-                              </p>
-                              <p className="mt-2 text-sm font-semibold text-ink">
-                                {selectedRecord.score}/{selectedRecord.total}
-                              </p>
+                              <h4 className="text-lg font-semibold text-ink">{item.title}</h4>
+                              <p className="mt-2 text-sm leading-7 text-ink/68">{item.copy}</p>
                             </div>
                           </div>
-                          <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
-                            <Button onClick={printCertificate} size="lg">
-                              Print / Download
-                            </Button>
-                          </div>
                         </div>
-                      </div>
-                    ) : (
-                      <Card className="border-sand/80 bg-[#FBFCFB] p-8">
-                        <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#015451]">
-                          Certificate preview
-                        </p>
-                        <p className="mt-4 text-sm leading-8 text-ink/66">
-                          No certificate has been generated yet for the selected module. Finish the
-                          quiz, enter a staff name, and the certificate will appear here.
-                        </p>
-                        {currentScore !== null ? (
-                          <div className="mt-6 rounded-[1.4rem] bg-white px-5 py-5">
-                            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#0C7380]">
-                              Current result
-                            </p>
-                            <p className="mt-2 text-lg font-semibold text-ink">
-                              {currentScore}/{selectedModule.quiz.length}
-                            </p>
-                          </div>
-                        ) : null}
-                      </Card>
-                    )}
+                      ))}
+                    </div>
+
+                    <div className="rounded-[1.45rem] border border-sand/80 bg-white px-5 py-5">
+                      <p className="text-sm leading-7 text-ink/68">
+                        Need help booking training or locating a certificate? Contact{" "}
+                        <a className="font-semibold text-teal-800" href={company.phoneHref}>
+                          {company.phone}
+                        </a>{" "}
+                        or{" "}
+                        <a className="font-semibold text-teal-800" href={company.emailHref}>
+                          {company.email}
+                        </a>
+                        .
+                      </p>
+                    </div>
                   </div>
-                ) : null}
+                </Card>
               </div>
-            </div>
-          </ScrollReveal>
+            </ScrollReveal>
+          </div>
         </div>
       </section>
     </div>

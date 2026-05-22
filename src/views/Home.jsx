@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import AppIcon from "../components/ui/AppIcon";
 import Badge from "../components/ui/Badge";
 import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
@@ -20,103 +21,44 @@ import {
   homeTrustStrip,
 } from "../data/site";
 
-function ShieldIcon({ className = "h-5 w-5" }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2">
-      <path
-        d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function HeartPulseIcon({ className = "h-5 w-5" }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2">
-      <path
-        d="M19.5 13.57 12 21l-7.5-7.43A5 5 0 0 1 12 6.18a5 5 0 0 1 7.5 7.39Z"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path d="M3 12h4l2-3 3 6 2-3h7" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function HomeIcon({ className = "h-5 w-5" }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="m3 10.5 9-7 9 7" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M5 9.5V20h14V9.5" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M9.5 20v-6h5v6" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function CommunityIcon({ className = "h-5 w-5" }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2" strokeLinecap="round" />
-      <circle cx="9.5" cy="7" r="3.5" />
-      <path d="M20 21v-2a4 4 0 0 0-3-3.87" strokeLinecap="round" />
-      <path d="M16 3.13a3.5 3.5 0 0 1 0 6.74" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function SparkIcon({ className = "h-5 w-5" }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="m12 3 1.8 4.2L18 9l-4.2 1.8L12 15l-1.8-4.2L6 9l4.2-1.8L12 3Z" />
-      <path d="M5 19l.8 1.8L7.5 22l-1.7.8L5 24l-.8-1.2L2.5 22l1.7-1.2L5 19Z" />
-      <path d="m19 14 .8 1.8L21.5 17l-1.7.8L19 19l-.8-1.2-1.7-.8 1.7-1.2L19 14Z" />
-    </svg>
-  );
-}
-
-function ClipboardIcon({ className = "h-5 w-5" }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2">
-      <rect x="8" y="3" width="8" height="4" rx="1.5" />
-      <path d="M8 5H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
-      <path d="M9 12h6M9 16h4" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function CheckIcon({ className = "h-4 w-4" }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2.2">
-      <path d="m5 12 4 4L19 6" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function ArrowIcon({ className = "h-4 w-4" }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M5 12h14" strokeLinecap="round" />
-      <path d="m13 6 6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-const trustIcons = [ShieldIcon, HomeIcon, HeartPulseIcon, ClipboardIcon];
-const serviceIcons = [HeartPulseIcon, SparkIcon, HomeIcon, ClipboardIcon, CommunityIcon];
+const serviceIcons = ["heartPulse", "sparkles", "house", "clipboardList", "usersRound"];
 
 function HeroSection() {
+  const slides = homeMedia.heroSlides?.length ? homeMedia.heroSlides : [homeMedia.hero];
+  const [activeSlide, setActiveSlide] = useState(0);
+
+  useEffect(() => {
+    if (slides.length <= 1) {
+      return undefined;
+    }
+
+    const intervalId = window.setInterval(() => {
+      setActiveSlide((current) => (current + 1) % slides.length);
+    }, 5200);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, [slides.length]);
+
   return (
     <section className="relative min-h-[22rem] overflow-hidden bg-[#082D36] sm:min-h-[38rem] lg:min-h-[37.5rem]">
-      <Image
-        src={homeMedia.hero}
-        alt="Support worker assisting a participant with guided upper-body movement"
-        fill
-        priority
-        sizes="100vw"
-        className="absolute inset-0 h-full w-full object-cover object-center"
-      />
+      {slides.map((slide, index) => {
+        const isActive = index === activeSlide;
+        const zoomClass = index % 2 === 0 ? "hero-slide-image--zoom-in" : "hero-slide-image--zoom-out";
+
+        return (
+          <Image
+            key={slide}
+            src={slide}
+            alt="Support worker assisting a participant with guided upper-body movement"
+            fill
+            priority={index === 0}
+            sizes="100vw"
+            className={`hero-slide-image ${zoomClass} absolute inset-0 h-full w-full object-cover object-center ${isActive ? "is-active" : ""}`}
+          />
+        );
+      })}
       <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(6,30,37,0.76)_0%,rgba(6,30,37,0.66)_30%,rgba(6,30,37,0.52)_58%,rgba(6,30,37,0.4)_100%)]" />
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,30,36,0.12)_0%,rgba(5,30,36,0.18)_32%,rgba(6,52,62,0.62)_72%,rgba(6,52,62,0.94)_100%)]" />
 
@@ -169,28 +111,48 @@ function HeroSection() {
 function TrustStripSection() {
   const marqueeItems = [...homeTrustStrip, ...homeTrustStrip];
 
+  function renderTrustIcon(item, index) {
+    if (item.iconAsset) {
+      return (
+        <Image
+          src={item.iconAsset}
+          alt=""
+          width={56}
+          height={56}
+          className="trust-strip-icon h-9 w-9 object-contain sm:h-10 sm:w-10"
+        />
+      );
+    }
+
+    return (
+      <AppIcon
+        name={item.icon || "shieldCheck"}
+        className="trust-strip-icon h-8 w-8 sm:h-9 sm:w-9"
+        strokeWidth={1.9}
+      />
+    );
+  }
+
   return (
     <section className="bg-white">
       <div className="site-container">
         <div className="border-b border-sand/80 py-8">
-          <div className="hidden gap-0 md:grid md:grid-cols-[0.92fr_1.08fr] lg:grid-cols-[0.8fr_1.2fr]">
-            <div className="pb-6 md:border-r md:border-sand/80 md:pb-0 md:pr-8">
+          <div className="hidden gap-0 md:grid md:grid-cols-[0.76fr_1.24fr] lg:grid-cols-[0.72fr_1.28fr]">
+            <div className="pb-6 md:border-r md:border-sand/80 md:pb-0 md:pr-7 lg:pr-8">
               <p className="max-w-[16rem] text-xl font-semibold leading-tight text-ink">
                 Trusted support for families across Western Australia.
               </p>
             </div>
 
-            <div className="grid gap-5 md:grid-cols-2 md:pl-8 xl:grid-cols-4">
+            <div className="grid grid-cols-3 gap-5 md:pl-10 lg:pl-12">
               {homeTrustStrip.map((item, index) => {
-                const Icon = trustIcons[index];
-
                 return (
-                  <div key={item.title} className="flex items-start gap-3">
-                    <span className="mt-1 flex h-11 w-11 items-center justify-center rounded-2xl bg-teal-50 text-teal-700">
-                      <Icon />
+                  <div key={item.title} className="trust-strip-item flex min-w-0 items-center gap-3">
+                    <span className="trust-strip-icon-wrap text-teal-700">
+                      {renderTrustIcon(item, index)}
                     </span>
-                    <div>
-                      <p className="text-base font-bold text-ink">{item.title}</p>
+                    <div className="min-w-0">
+                      <p className="whitespace-nowrap text-[1.03rem] font-bold text-ink">{item.title}</p>
                       <p className="mt-1 text-sm leading-6 text-ink/60">{item.note}</p>
                     </div>
                   </div>
@@ -202,15 +164,13 @@ function TrustStripSection() {
           <div className="overflow-hidden md:hidden">
             <div className="marquee-track">
               {marqueeItems.map((item, index) => {
-                const Icon = trustIcons[index % trustIcons.length];
-
                 return (
                   <div
                     key={`${item.title}-${index}`}
-                    className="inline-flex flex-none items-center gap-3 rounded-full border border-sand/80 bg-[#F8FBFA] px-4 py-3 shadow-[0_8px_24px_rgba(11,45,54,0.05)]"
+                    className="inline-flex flex-none items-center gap-3 px-2 py-2"
                   >
-                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-teal-50 text-teal-700">
-                      <Icon />
+                    <span className="trust-strip-icon-wrap text-teal-700">
+                      {renderTrustIcon(item, index)}
                     </span>
                     <p className="whitespace-nowrap text-sm font-bold text-ink">{item.title}</p>
                   </div>
@@ -232,23 +192,17 @@ function AboutSection() {
           <div className="max-w-2xl space-y-6">
             <Badge tone="default">About Emerging Nursing</Badge>
             <h2 className="text-balance text-4xl font-display font-semibold leading-[1.02] text-ink sm:text-5xl">
-              Respectful support that strengthens independence
+              Supporting Independence With Care and Confidence
             </h2>
             <p className="max-w-xl text-base leading-8 text-ink/68 sm:text-lg">
               Emerging Nursing and Disability Services supports people through the NDIS and aims to
               enable Australians with disabilities to live as autonomously and independently as
               possible.
             </p>
-            <div className="flex flex-wrap gap-3">
-              {company.locations.map((location) => (
-                <span
-                  key={location}
-                  className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-teal-800 shadow-soft"
-                >
-                  {location}
-                </span>
-              ))}
-            </div>
+            <div className="mt-12 flex flex-col gap-4 sm:flex-row">
+              <Button to="/about" size="sm">Read More</Button>
+              <Button to="/contact" variant="ghost" size="sm">Contact Us</Button>
+             </div>
           </div>
         </Reveal>
 
@@ -294,7 +248,7 @@ function ServicesSection() {
 
         <div className="mt-14 grid gap-6 md:grid-cols-2 xl:grid-cols-5">
           {homeServices.map((service, index) => {
-            const Icon = serviceIcons[index];
+            const iconName = serviceIcons[index];
             const styles = [
               "bg-[#032a29] text-white",
               "bg-[#0b6b66] text-white",
@@ -309,7 +263,7 @@ function ServicesSection() {
                 <div className={`group h-full rounded-[1.6rem] p-8 ${style} shadow-soft flex flex-col items-center justify-between transform-gpu transition-transform duration-300 ease-out hover:-translate-y-2 hover:shadow-xl overflow-hidden`}>
                   <div className="flex flex-col items-center gap-6 text-center">
                     <span>
-                      <Icon className="h-10 w-10" />
+                      <AppIcon name={iconName} className="h-10 w-10" strokeWidth={2} />
                     </span>
                     <h3 className={`text-lg font-display font-semibold ${style.includes("text-ink") ? "text-ink" : "text-white"}`}>
                       {service.title}
@@ -320,7 +274,7 @@ function ServicesSection() {
                   <div className="mt-6 w-full flex justify-center">
                     <Link
                       href="/services"
-                      className="inline-flex items-center justify-center rounded-full px-6 py-2 text-sm font-semibold bg-white text-ink"
+                      className="inline-flex items-center justify-center rounded-full px-6 py-2 text-sm font-semibold text-white underline"
                     >
                       View details
                     </Link>
@@ -332,7 +286,7 @@ function ServicesSection() {
         </div>
 
         <div className="mt-10 text-center">
-          <Button to="/services" variant="secondary" size="md">
+          <Button to="/services" size="sm">
             View all services
           </Button>
         </div>
@@ -408,7 +362,7 @@ function ChoiceSection() {
                   className="flex items-start gap-3 rounded-[1.4rem] border border-white/10 bg-white/6 px-4 py-4"
                 >
                   <span className="mt-1 text-teal-200">
-                    <CheckIcon />
+                    <AppIcon name="check" className="h-4 w-4" strokeWidth={2.2} />
                   </span>
                   <p className="text-sm leading-7 text-white/78">{item}</p>
                 </div>
@@ -489,9 +443,7 @@ function FaqItem({ item, isOpen, onToggle }) {
       >
         <span className="text-base font-semibold text-ink sm:text-lg">{item.question}</span>
         <span className={`text-teal-700 transition-transform duration-300 ${isOpen ? "rotate-45" : ""}`}>
-          <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M12 5v14M5 12h14" strokeLinecap="round" />
-          </svg>
+          <AppIcon name="plus" className="h-5 w-5" strokeWidth={2} />
         </span>
       </button>
       <div

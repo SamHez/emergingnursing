@@ -1,15 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { cloneElement, isValidElement, useState } from "react";
 import FeaturePageHero from "../components/sections/FeaturePageHero";
+import AppIcon from "../components/ui/AppIcon";
 import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
 import ScrollReveal from "../components/ui/ScrollReveal";
 import SectionHeader from "../components/ui/SectionHeader";
 import { company, pageMedia } from "../data/site";
-import { API_BASE_URL } from "../lib/api";
-
-const STORAGE_KEY = "emerging_contact_demo";
+import {
+  PUBLIC_API_ENDPOINTS,
+  apiPostJson,
+  mapApiErrors,
+} from "../lib/api";
 
 const enquiryOptions = [
   "General enquiry",
@@ -25,60 +28,50 @@ const initialForm = {
   phone: "",
   enquiryType: "",
   message: "",
-  consent: false,
 };
 
-function PhoneIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9">
-      <path
-        d="M6.8 4h2.4a1 1 0 0 1 1 .82l.42 2.5a1 1 0 0 1-.29.88L8.8 9.74a13 13 0 0 0 5.46 5.46l1.54-1.53a1 1 0 0 1 .88-.29l2.5.42a1 1 0 0 1 .82 1v2.4a1 1 0 0 1-.95 1A15.5 15.5 0 0 1 5.8 4.95 1 1 0 0 1 6.8 4Z"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function MailIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9">
-      <path d="M4 7.5h16v9A1.5 1.5 0 0 1 18.5 18h-13A1.5 1.5 0 0 1 4 16.5v-9Z" />
-      <path d="m5 8 7 5 7-5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function PinIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9">
-      <path
-        d="M12 20s5-3.5 5-8.5a5 5 0 1 0-10 0C7 16.5 12 20 12 20Z"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <circle cx="12" cy="11" r="1.75" />
-    </svg>
-  );
-}
-
-function CheckIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.2">
-      <path d="m5 12 4 4L19 6" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
+const contactCards = [
+  {
+    label: "Phone",
+    icon: "phone",
+    value: company.phone,
+    href: company.phoneHref,
+  },
+  {
+    label: "Email",
+    icon: "mail",
+    value: company.email,
+    href: company.emailHref,
+  },
+  {
+    label: "Location",
+    icon: "mapPin",
+    value: company.contactLocations[0],
+    href: null,
+  },
+];
 
 function Field({ label, name, error, required = false, children }) {
+  const errorId = `${name}-error`;
+  const control = isValidElement(children)
+    ? cloneElement(children, {
+        "aria-invalid": Boolean(error),
+        "aria-describedby": error ? errorId : undefined,
+      })
+    : children;
+
   return (
     <div className="space-y-2">
       <label htmlFor={name} className="block text-sm font-semibold text-ink">
         {label}
         {required ? <span className="ml-1 text-[#015451]">*</span> : null}
       </label>
-      {children}
-      {error ? <p className="text-sm font-medium text-rose-700">{error}</p> : null}
+      {control}
+      {error ? (
+        <p id={errorId} className="text-sm font-medium text-rose-700">
+          {error}
+        </p>
+      ) : null}
     </div>
   );
 }
@@ -99,24 +92,24 @@ function validateForm(form) {
   if (!form.phone.trim()) errors.phone = "Phone is required.";
   if (!form.enquiryType) errors.enquiryType = "Please choose an enquiry type.";
   if (!form.message.trim()) errors.message = "Please enter your message.";
-  if (!form.consent) errors.consent = "Consent is required before submitting.";
 
   return errors;
 }
 
 export default function Contact() {
-  const futureEndpoint = `${API_BASE_URL}/v1/contact`;
-
   const [form, setForm] = useState(initialForm);
   const [errors, setErrors] = useState({});
+  const [submitting, setSubmitting] = useState(false);
+  const [submissionError, setSubmissionError] = useState("");
   const [submitted, setSubmitted] = useState(null);
 
   function updateField(name, value) {
     setForm((current) => ({ ...current, [name]: value }));
     setErrors((current) => ({ ...current, [name]: undefined }));
+    setSubmissionError("");
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
 
     const nextErrors = validateForm(form);
@@ -126,20 +119,40 @@ export default function Contact() {
       return;
     }
 
-    const payload = {
-      ...form,
-      submittedAt: new Date().toISOString(),
-    };
+    setSubmitting(true);
+    setSubmissionError("");
 
-    const existing = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-    localStorage.setItem(STORAGE_KEY, JSON.stringify([payload, ...existing]));
+    try {
+      await apiPostJson(PUBLIC_API_ENDPOINTS.contact, {
+        full_name: form.fullName.trim(),
+        email: form.email.trim(),
+        phone: form.phone.trim(),
+        subject: form.enquiryType,
+        message: form.message.trim(),
+      });
 
-    // Connect an API or email workflow here when backend handling is confirmed.
-    // Example: await fetch(futureEndpoint, { method: "POST", body: JSON.stringify(payload) });
+      setSubmitted({
+        fullName: form.fullName.trim(),
+        enquiryType: form.enquiryType,
+      });
+      setForm(initialForm);
+      setErrors({});
+    } catch (error) {
+      const fieldErrors = mapApiErrors(error.errors, {
+        full_name: "fullName",
+        subject: "enquiryType",
+      });
 
-    setSubmitted(payload);
-    setForm(initialForm);
-    setErrors({});
+      if (Object.keys(fieldErrors).length > 0) {
+        setErrors(fieldErrors);
+      }
+
+      setSubmissionError(
+        error.message || "We could not send your enquiry right now. Please try again.",
+      );
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -165,66 +178,31 @@ export default function Contact() {
             />
           </ScrollReveal>
 
-          <div className="mt-14 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-            <ScrollReveal>
-              <Card className="h-full border-sand/80 bg-[#FBFCFB] p-7">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#E8F6F4] text-[#015451]">
-                  <PhoneIcon />
-                </div>
-                <p className="mt-5 text-sm font-semibold uppercase tracking-[0.24em] text-[#015451]">
-                  Phone
-                </p>
-                <a href={company.phoneHref} className="mt-3 block text-xl font-bold text-ink">
-                  {company.phone}
-                </a>
-              </Card>
-            </ScrollReveal>
-
-            <ScrollReveal delay={60}>
-              <Card className="h-full border-sand/80 bg-[#FBFCFB] p-7">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#E8F6F4] text-[#015451]">
-                  <MailIcon />
-                </div>
-                <p className="mt-5 text-sm font-semibold uppercase tracking-[0.24em] text-[#015451]">
-                  Email
-                </p>
-                <a href={company.emailHref} className="mt-3 block text-xl font-bold break-all text-ink">
-                  {company.email}
-                </a>
-              </Card>
-            </ScrollReveal>
-
-            <ScrollReveal delay={120}>
-              <Card className="h-full border-sand/80 bg-[#FBFCFB] p-7">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#E8F6F4] text-[#015451]">
-                  <PinIcon />
-                </div>
-                <p className="mt-5 text-sm font-semibold uppercase tracking-[0.24em] text-[#015451]">
-                  Locations
-                </p>
-                <div className="mt-3 space-y-3 text-sm leading-7 text-ink/72">
-                  {company.contactLocations.map((location) => (
-                    <p key={location}>{location}</p>
-                  ))}
-                </div>
-              </Card>
-            </ScrollReveal>
-
-            <ScrollReveal delay={180}>
-              <Card className="h-full border-sand/80 bg-[linear-gradient(180deg,#0F4C4B_0%,#0B6764_100%)] p-7 text-white">
-                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-teal-200">
-                  Referral
-                </p>
-                <p className="mt-4 text-sm leading-8 text-white/78">
-                  Need to discuss supports for a participant? Start with the referral pathway.
-                </p>
-                <div className="mt-6">
-                  <Button to="/referrals" variant="secondary">
-                    Make a Referral
-                  </Button>
-                </div>
-              </Card>
-            </ScrollReveal>
+          <div className="mt-14 grid gap-5 lg:grid-cols-3">
+            {contactCards.map((card, index) => (
+              <ScrollReveal key={card.label} delay={index * 60}>
+                <Card className="h-full border-white/10 bg-[linear-gradient(150deg,#0F4C4B_0%,#0D6761_52%,#0A7B73_100%)] p-7 text-white shadow-[0_28px_60px_rgba(10,69,67,0.16)]">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/14 text-white shadow-[0_12px_28px_rgba(4,22,24,0.14)]">
+                    <AppIcon name={card.icon} className="h-5 w-5" />
+                  </div>
+                  <p className="mt-5 text-sm font-semibold uppercase tracking-[0.24em] text-white/74">
+                    {card.label}
+                  </p>
+                  {card.href ? (
+                    <a
+                      href={card.href}
+                      className="mt-3 block text-[1.35rem] font-semibold leading-[1.45] break-words text-white"
+                    >
+                      {card.value}
+                    </a>
+                  ) : (
+                    <p className="mt-3 text-[1.35rem] font-semibold leading-[1.55] text-white">
+                      {card.value}
+                    </p>
+                  )}
+                </Card>
+              </ScrollReveal>
+            ))}
           </div>
         </div>
       </section>
@@ -236,16 +214,22 @@ export default function Contact() {
             <ScrollReveal>
               <div className="rounded-[2.2rem] border border-white/45 bg-white/72 p-4 shadow-soft">
                 {submitted ? (
-                  <div className="rounded-[1.8rem] bg-[#0F4C4B] px-6 py-8 text-white sm:px-8">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/12 text-teal-100">
-                      <CheckIcon />
+                  <div
+                    role="status"
+                    aria-live="polite"
+                    className="rounded-[1.8rem] bg-[linear-gradient(145deg,#0F4C4B_0%,#0D6761_48%,#0C7F74_100%)] px-6 py-10 text-white sm:px-10 sm:py-12"
+                  >
+                    <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-white/12 text-teal-100 ring-1 ring-white/12">
+                      <AppIcon name="check" className="h-5 w-5" strokeWidth={2.3} />
                     </div>
-                    <h2 className="mt-5 text-2xl font-bold sm:text-3xl">Enquiry received</h2>
-                    <p className="mt-4 max-w-2xl text-sm leading-7 text-white/80 sm:text-base">
-                      Thanks for getting in touch. This demo enquiry has been saved locally and is
-                      ready to connect to a future API or email workflow.
-                    </p>
-                    <div className="mt-6 rounded-[1.5rem] bg-white/10 px-5 py-5 text-sm leading-7 text-white/84">
+                    <div className="mx-auto mt-6 max-w-2xl text-center">
+                      <h2 className="text-3xl font-bold tracking-[-0.03em] sm:text-[2.2rem]">Enquiry received</h2>
+                      <p className="mt-4 text-sm leading-7 text-white/82 sm:text-base">
+                      Thanks for getting in touch. Our team has received your enquiry and will be in
+                      contact soon.
+                      </p>
+                    </div>
+                    <div className="mx-auto mt-7 max-w-xl rounded-[1.5rem] border border-white/10 bg-white/10 px-5 py-5 text-center text-sm leading-7 text-white/84">
                       <p>
                         <span className="font-semibold text-white">Name:</span> {submitted.fullName}
                       </p>
@@ -254,8 +238,8 @@ export default function Contact() {
                         {submitted.enquiryType}
                       </p>
                     </div>
-                    <div className="mt-6">
-                      <Button onClick={() => setSubmitted(null)} variant="secondary" size="lg">
+                    <div className="mt-8 flex justify-center">
+                      <Button onClick={() => setSubmitted(null)} variant="secondary" size="lg" className="min-w-[14rem] justify-center">
                         Send Another Enquiry
                       </Button>
                     </div>
@@ -264,7 +248,7 @@ export default function Contact() {
                   <form
                     noValidate
                     onSubmit={handleSubmit}
-                    data-api-endpoint={futureEndpoint}
+                    data-api-endpoint={PUBLIC_API_ENDPOINTS.contact}
                     className="rounded-[1.8rem] bg-[#F8F4EC] p-6 sm:p-7"
                   >
                     <SectionHeader
@@ -329,28 +313,23 @@ export default function Contact() {
                       </div>
                     </div>
 
-                    <div className="mt-6 rounded-[1.2rem] border border-sand/90 bg-white px-4 py-4">
-                      <label className="flex items-start gap-3 text-sm text-ink">
-                        <input
-                          type="checkbox"
-                          checked={form.consent}
-                          onChange={(event) => updateField("consent", event.target.checked)}
-                          className="mt-1 h-4 w-4 rounded border-sand text-[#0C7380] focus:ring-teal-200"
-                        />
-                        <span>
-                          I consent to being contacted about this enquiry and understand this is a
-                          frontend demo submission stored locally in the browser.
-                        </span>
-                      </label>
-                      {errors.consent ? (
-                        <p className="mt-3 text-sm font-medium text-rose-700">{errors.consent}</p>
-                      ) : null}
-                    </div>
+                    {submissionError ? (
+                      <div
+                        role="alert"
+                        className="mt-6 rounded-[1.2rem] border border-rose-200 bg-rose-50 px-4 py-4 text-sm leading-7 text-rose-800"
+                      >
+                        {submissionError}
+                      </div>
+                    ) : null}
 
                     <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                      
-                      <Button type="submit" size="lg" className="justify-center">
-                        Send Enquiry
+                      <Button
+                        type="submit"
+                        size="lg"
+                        disabled={submitting}
+                        className="justify-center disabled:cursor-not-allowed disabled:opacity-70"
+                      >
+                        {submitting ? "Sending..." : "Send Enquiry"}
                       </Button>
                     </div>
                   </form>

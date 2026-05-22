@@ -1,103 +1,28 @@
 import Image from "next/image";
 import FeaturePageHero from "../components/sections/FeaturePageHero";
+import AppIcon from "../components/ui/AppIcon";
 import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
 import ScrollReveal from "../components/ui/ScrollReveal";
 import SectionHeader from "../components/ui/SectionHeader";
 import { pageMedia } from "../data/site";
 
-function NurseIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9">
-      <path d="M12 6v12M8 10h8" strokeLinecap="round" />
-      <path d="M6 7.5h12v10A2.5 2.5 0 0 1 15.5 20h-7A2.5 2.5 0 0 1 6 17.5v-10Z" />
-    </svg>
-  );
-}
-
-function CompassIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9">
-      <circle cx="12" cy="12" r="8" />
-      <path d="m10 10 5-2-2 5-4 2 1-5Z" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function HomeIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9">
-      <path d="m3 10 9-6 9 6" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M6 10.5V20h12v-9.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function BriefcaseIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9">
-      <path d="M8 7V5.5A1.5 1.5 0 0 1 9.5 4h5A1.5 1.5 0 0 1 16 5.5V7" />
-      <rect x="4" y="7" width="16" height="12" rx="2" />
-      <path d="M4 12h16" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function CarIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9">
-      <path d="M6.5 15h11l-1-4.2A2 2 0 0 0 14.56 9H9.44a2 2 0 0 0-1.94 1.8L6.5 15Z" />
-      <path d="M5 15h14a1 1 0 0 1 1 1v2h-2M4 18H2v-2a1 1 0 0 1 1-1h1" strokeLinecap="round" />
-      <circle cx="7" cy="18" r="1.5" />
-      <circle cx="17" cy="18" r="1.5" />
-    </svg>
-  );
-}
-
-function ArrowUpIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9">
-      <path d="M12 18V6" strokeLinecap="round" />
-      <path d="m7 11 5-5 5 5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function GroupIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9">
-      <circle cx="8.5" cy="8" r="3" />
-      <circle cx="16.5" cy="9.5" r="2.5" />
-      <path d="M3.5 19a5 5 0 0 1 10 0" strokeLinecap="round" />
-      <path d="M14 18a4 4 0 0 1 6.5-3.12" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function CheckIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.2">
-      <path d="m5 12 4 4L19 6" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
 const overviewServices = [
-  { title: "Registered and Enrolled Nurse Support", icon: NurseIcon, desc: "Clinical nursing care for complex and routine health needs at home." },
-  { title: "Support Coordination", icon: CompassIcon, desc: "Help to connect services and make your NDIS plan easier to use." },
-  { title: "Support Work", icon: GroupIcon, desc: "Practical daily living assistance to build independence and routines." },
-  { title: "Capacity Building", icon: ArrowUpIcon, desc: "Goal-focused supports to strengthen skills and community involvement." },
-  { title: "Community Access", icon: GroupIcon, desc: "Support to participate in community activities, appointments, and social life." },
-  { title: "Transport Support", icon: CarIcon, desc: "Safe and reliable transport for appointments, social activities, and essentials." },
-  { title: "Employment Support", icon: BriefcaseIcon, desc: "Practical support to find and sustain meaningful work or training." },
-  { title: "Support in the Home", icon: HomeIcon, desc: "Home-based assistance that keeps routines, safety and wellbeing steady." },
+  { title: "Registered and Enrolled Nurse Support", icon: "stethoscope", desc: "Clinical nursing care for complex and routine health needs at home." },
+  { title: "Support Coordination", icon: "compass", desc: "Help to connect services and make your NDIS plan easier to use." },
+  { title: "Support Work", icon: "usersRound", desc: "Practical daily living assistance to build independence and routines." },
+  { title: "Capacity Building", icon: "trendingUp", desc: "Goal-focused supports to strengthen skills and community involvement." },
+  { title: "Community Access", icon: "usersRound", desc: "Support to participate in community activities, appointments, and social life." },
+  { title: "Transport Support", icon: "carFront", desc: "Safe and reliable transport for appointments, social activities, and essentials." },
+  { title: "Employment Support", icon: "briefcaseBusiness", desc: "Practical support to find and sustain meaningful work or training." },
+  { title: "Support in the Home", icon: "house", desc: "Home-based assistance that keeps routines, safety and wellbeing steady." },
 ];
 
 const detailedServices = [
   {
     eyebrow: "Nursing Support",
     title: "Clinical support delivered with calm oversight and practical confidence.",
-    icon: NurseIcon,
+    icon: "stethoscope",
     tone: "dark",
     items: [
       "Medication management",
@@ -111,7 +36,7 @@ const detailedServices = [
   {
     eyebrow: "Support Coordination",
     title: "Guidance that helps make your NDIS plan clearer and easier to use well.",
-    icon: CompassIcon,
+    icon: "compass",
     tone: "light",
     items: [
       "Understand your NDIS Plan",
@@ -123,14 +48,14 @@ const detailedServices = [
   {
     eyebrow: "Support Work",
     title: "Reliable everyday assistance shaped around dignity, comfort, and participation.",
-    icon: GroupIcon,
+    icon: "usersRound",
     tone: "light",
     items: ["Personal care", "Household tasks", "Social support", "Transportation"],
   },
   {
     eyebrow: "Capacity Building",
     title: "Goal-focused support that strengthens confidence, skills, and community connection.",
-    icon: ArrowUpIcon,
+    icon: "trendingUp",
     tone: "dark",
     items: [
       "Life skills development",
@@ -186,14 +111,12 @@ export default function Services() {
 
           <div className="mt-14 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
             {overviewServices.map((service, index) => {
-                const Icon = service.icon;
-
                 return (
                   <ScrollReveal key={service.title} delay={index * 60}>
                     <Card className="h-full border-sand/80 bg-[#FBFCFB] p-7 flex flex-col items-start justify-between">
                       <div>
                         <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#E8F6F4] text-[#015451]">
-                          <Icon />
+                          <AppIcon name={service.icon} className="h-5 w-5" />
                         </div>
                         <h2 className="mt-5 text-xl font-bold leading-tight text-ink">{service.title}</h2>
                         <p className="mt-3 max-w-[18rem] text-sm leading-7 text-ink/72">{service.desc}</p>
@@ -219,7 +142,6 @@ export default function Services() {
 
           <div className="mt-14 grid gap-6">
             {detailedServices.map((service, index) => {
-              const Icon = service.icon;
               const dark = service.tone === "dark";
 
               return (
@@ -233,7 +155,7 @@ export default function Services() {
                         style={{borderRadius: '30px'}}
                       >
                         <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/14">
-                          <Icon />
+                          <AppIcon name={service.icon} className="h-5 w-5" />
                         </div>
                         <p
                           className={`mt-5 text-sm font-semibold uppercase tracking-[0.24em] ${
@@ -254,7 +176,7 @@ export default function Services() {
                             className="flex items-start gap-3 rounded-[1.5rem] border border-sand/70 bg-white px-4 py-4"
                           >
                             <span className="mt-1 text-[#015451]">
-                              <CheckIcon />
+                              <AppIcon name="check" className="h-4 w-4" strokeWidth={2.2} />
                             </span>
                             <p className="text-sm leading-7 text-ink/72">{item}</p>
                           </div>

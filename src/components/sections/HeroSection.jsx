@@ -1,29 +1,9 @@
 import { company } from "../../data/site";
 import Button from "../ui/Button";
 import Badge from "../ui/Badge";
+import AppIcon from "../ui/AppIcon";
 import Card from "../ui/Card";
 import Reveal from "../ui/Reveal";
-
-function TickIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5 text-teal-700" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="m5 12 4 4L19 6" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function PinIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5 text-sky-600" fill="none" stroke="currentColor" strokeWidth="2">
-      <path
-        d="M12 21s6-4.35 6-10a6 6 0 1 0-12 0c0 5.65 6 10 6 10Z"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <circle cx="12" cy="11" r="2.5" />
-    </svg>
-  );
-}
 
 export default function HeroSection() {
   return (
@@ -54,7 +34,7 @@ export default function HeroSection() {
                   Nursing and disability support that protects dignity and builds independence.
                 </h1>
                 <p className="max-w-2xl text-lg leading-8 text-white/78">
-                  {company.aim} Trusted support across High Wycombe, Caversham, and the wider
+                  {company.aim} Trusted support across Bennett Springs and the wider
                   Western Australia community.
                 </p>
               </div>
@@ -113,7 +93,7 @@ export default function HeroSection() {
                     "Professional nursing oversight for everyday and complex needs",
                   ].map((item) => (
                     <div key={item} className="flex items-start gap-3 rounded-[1.5rem] bg-white/75 p-4">
-                      <TickIcon />
+                      <AppIcon name="check" className="h-5 w-5 text-teal-700" strokeWidth={2} />
                       <p className="text-sm leading-7 text-ink/75">{item}</p>
                     </div>
                   ))}
@@ -149,7 +129,7 @@ export default function HeroSection() {
                 </p>
                 {company.locations.map((location) => (
                   <div key={location} className="flex items-start gap-3 rounded-[1.5rem] bg-sky-50 p-4">
-                    <PinIcon />
+                    <AppIcon name="mapPin" className="h-5 w-5 text-sky-600" strokeWidth={2} />
                     <p className="text-sm leading-7 text-ink/76">{location}</p>
                   </div>
                 ))}

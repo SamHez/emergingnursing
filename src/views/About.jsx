@@ -1,55 +1,11 @@
 import Image from "next/image";
 import FeaturePageHero from "../components/sections/FeaturePageHero";
+import AppIcon from "../components/ui/AppIcon";
 import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
 import ScrollReveal from "../components/ui/ScrollReveal";
 import SectionHeader from "../components/ui/SectionHeader";
 import { company, pageMedia } from "../data/site";
-
-function LocationIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9">
-      <path
-        d="M12 20s5-3.5 5-8.5a5 5 0 1 0-10 0C7 16.5 12 20 12 20Z"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <circle cx="12" cy="11" r="1.75" />
-    </svg>
-  );
-}
-
-function ValuesIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
-      <path d="m12 3 2.1 4.82L19 9.1l-3.68 3.2L16 17l-4-2.3L8 17l.68-4.7L5 9.1l4.9-1.28L12 3Z" />
-    </svg>
-  );
-}
-
-function ShieldIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9">
-      <path
-        d="M12 21s7-3.6 7-9.1V6.2L12 3 5 6.2v5.7C5 17.4 12 21 12 21Z"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path d="m9.4 12 1.8 1.8 3.6-3.8" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function GroupIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9">
-      <circle cx="8.5" cy="8" r="3" />
-      <circle cx="16.5" cy="9.5" r="2.5" />
-      <path d="M3.5 19a5 5 0 0 1 10 0" strokeLinecap="round" />
-      <path d="M14 18a4 4 0 0 1 6.5-3.12" strokeLinecap="round" />
-    </svg>
-  );
-}
 
 const values = company.values.map((value) => ({
   title: value,
@@ -135,7 +91,7 @@ export default function About() {
                   key={location}
                   className="inline-flex items-center gap-2 rounded-full border border-sand bg-cream px-4 py-2 text-sm font-semibold text-[#015451]"
                 >
-                  <LocationIcon />
+                  <AppIcon name="mapPin" className="h-5 w-5" />
                   <span>{location}</span>
                 </div>
               ))}
@@ -195,7 +151,7 @@ export default function About() {
               <ScrollReveal key={item.title} delay={index * 70}>
                 <Card className="h-full border-sand/80 bg-[#FBFCFB] p-6">
                   <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-teal-50 text-[#015451]">
-                    <ValuesIcon />
+                    <AppIcon name="badgeCheck" className="h-5 w-5" strokeWidth={1.8} />
                   </div>
                   <h3 className="mt-5 text-xl font-bold text-ink">{item.title}</h3>
                   <p className="mt-3 text-sm leading-7 text-ink/66">{item.text}</p>
@@ -220,7 +176,7 @@ export default function About() {
                 <ScrollReveal key={item} delay={index * 80}>
                   <div className="flex items-start gap-4 rounded-[1.7rem] border border-white/80 bg-white/85 px-5 py-5 shadow-soft">
                     <span className="mt-1 flex h-10 w-10 items-center justify-center rounded-2xl bg-teal-50 text-[#015451]">
-                      {index < 2 ? <GroupIcon /> : <ShieldIcon />}
+                      <AppIcon name={index < 2 ? "usersRound" : "shieldCheck"} className="h-5 w-5" />
                     </span>
                     <p className="text-sm leading-7 text-ink/72">{item}</p>
                   </div>
@@ -245,7 +201,7 @@ export default function About() {
                   Local support
                 </p>
                 <p className="mt-3 text-sm leading-7 text-ink/72">
-                  With service presence in High Wycombe and Caversham, our support remains grounded
+                  With service presence in Bennett Springs, our support remains grounded
                   in local understanding and practical coordination.
                 </p>
               </div>
@@ -275,7 +231,7 @@ export default function About() {
               >
                 <Card className="h-full border-sand/80 bg-[#FBFCFB] p-7">
                   <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#E8F6F4] text-[#015451]">
-                    <ShieldIcon />
+                    <AppIcon name="shieldCheck" className="h-5 w-5" />
                   </div>
                   <h3 className="mt-5 text-xl font-bold leading-tight text-ink">{item.title}</h3>
                   <p className="mt-3 text-sm leading-7 text-ink/66">{item.text}</p>
