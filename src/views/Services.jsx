@@ -31,6 +31,12 @@ const detailedServices = [
       "Indwelling and suprapubic catheter support",
       "Health monitoring",
       "Staff and family training for complex care needs",
+      "Dysphagia Support",
+      "Subcutaneus Injections",
+      "Complex Bowel Care",
+      "Tracheostomy",
+      "Continence Assessments & Management"
+
     ],
   },
   {
