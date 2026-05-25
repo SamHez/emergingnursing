@@ -35,7 +35,9 @@ const detailedServices = [
       "Subcutaneus Injections",
       "Complex Bowel Care",
       "Tracheostomy",
-      "Continence Assessments & Management"
+      "Continence Assessments & Management",
+      "Dementia Care",
+      "SIL & Respite Homes"
 
     ],
   },
