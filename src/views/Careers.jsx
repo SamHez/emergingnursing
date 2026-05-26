@@ -584,14 +584,14 @@ export default function Careers() {
 
       {isInterestModalOpen ? (
         <div
-          className="fixed inset-0 z-[110] flex items-start justify-center bg-[#072D33]/65 px-4 py-6 backdrop-blur-sm sm:px-6 sm:py-10"
+          className="careers-interest-modal-overlay fixed inset-0 z-[110] flex items-start justify-center bg-[#072D33]/65 px-4 py-6 backdrop-blur-sm sm:px-6 sm:py-10"
           role="dialog"
           aria-modal="true"
           aria-labelledby="careers-interest-modal-title"
           onClick={closeInterestModal}
         >
           <div
-            className="relative max-h-[calc(100vh-3rem)] w-full max-w-5xl overflow-y-auto rounded-[2rem] border border-white/45 bg-white shadow-[0_30px_90px_rgba(5,34,40,0.24)]"
+            className="careers-interest-modal-panel relative max-h-[calc(100vh-3rem)] w-full max-w-5xl overflow-y-auto rounded-[2rem] border border-white/45 bg-white shadow-[0_30px_90px_rgba(5,34,40,0.24)]"
             onClick={(event) => event.stopPropagation()}
           >
             <button

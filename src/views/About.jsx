@@ -9,6 +9,13 @@ import { company, pageMedia } from "../data/site";
 
 const values = company.values.map((value) => ({
   title: value,
+  icon: {
+    Accountability: "clipboardList",
+    Trust: "shieldCheck",
+    Respect: "heart",
+    Passion: "sparkles",
+    Inclusiveness: "usersRound",
+  }[value],
   text: {
     Accountability: "We take ownership of care quality, communication, and the outcomes we influence.",
     Trust: "We build dependable relationships through consistency, respect, and transparent support.",
@@ -138,23 +145,53 @@ export default function About() {
 
       <section className="bg-white py-16 sm:py-20 lg:py-24">
         <div className="site-container">
-          <ScrollReveal>
-            <SectionHeader
-              badge="Our Values"
-              title="Five values that shape every support relationship."
-              description="These principles guide how we communicate, plan care, and show up consistently for clients and families."
-            />
-          </ScrollReveal>
+          <div className="grid gap-8 lg:grid-cols-[0.92fr_1.08fr] lg:items-center">
+            <ScrollReveal>
+              <SectionHeader
+                badge="Our Values"
+                title="Five values that shape every support relationship."
+                description="These principles guide how we communicate, plan care, and show up consistently for clients and families."
+              />
+            </ScrollReveal>
+
+            <ScrollReveal delay={100}>
+              <div className="relative overflow-hidden rounded-[2.2rem] border border-sand/70 shadow-soft">
+                <Image
+                  src={pageMedia.aboutApproach1}
+                  alt="Support worker and participant sharing a calm, connected moment"
+                  width={1200}
+                  height={760}
+                  sizes="(min-width: 1024px) 48vw, 100vw"
+                  className="h-[15rem] w-full object-cover sm:h-[18rem] lg:h-[19rem]"
+                />
+                <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(8,46,54,0.46)_0%,rgba(8,46,54,0.12)_48%,rgba(8,46,54,0.08)_100%)]" />
+                <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
+                  <div className="max-w-md rounded-[1.4rem] bg-white/88 px-5 py-4 backdrop-blur-sm hidden">
+                    <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#015451]">
+                      Values in Practice
+                    </p>
+                    <p className="mt-2 text-sm leading-7 text-ink/72">
+                      Every interaction is shaped by reliability, dignity, empathy, and support that feels genuinely inclusive.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </ScrollReveal>
+          </div>
 
           <div className="mt-12 grid gap-5 sm:grid-cols-2 xl:grid-cols-5">
             {values.map((item, index) => (
               <ScrollReveal key={item.title} delay={index * 70}>
-                <Card className="h-full border-sand/80 bg-[#FBFCFB] p-6">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-teal-50 text-[#015451]">
-                    <AppIcon name="badgeCheck" className="h-5 w-5" strokeWidth={1.8} />
+                <Card className="h-full border-sand/80 bg-[#FBFCFB] p-5 sm:p-6">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[1.15rem] bg-teal-50 text-[#015451] sm:h-11 sm:w-11">
+                      <AppIcon name={item.icon} className="h-4 w-4 sm:h-[1.15rem] sm:w-[1.15rem]" strokeWidth={1.9} />
+                    </div>
+                    <h3 className="text-[1.28rem] font-bold leading-tight text-ink sm:text-[1.38rem]">
+                      {item.title}
+                    </h3>
                   </div>
-                  <h3 className="mt-5 text-xl font-bold text-ink">{item.title}</h3>
-                  <p className="mt-3 text-sm leading-7 text-ink/66">{item.text}</p>
+                  <p className="mt-4 text-sm leading-7 text-ink/66">{item.text}</p>
                 </Card>
               </ScrollReveal>
             ))}

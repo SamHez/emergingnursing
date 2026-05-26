@@ -1,6 +1,6 @@
 "use client";
 
-import { cloneElement, isValidElement, useMemo, useState } from "react";
+import { cloneElement, isValidElement, useEffect, useMemo, useRef, useState } from "react";
 import FeaturePageHero from "../components/sections/FeaturePageHero";
 import AppIcon from "../components/ui/AppIcon";
 import Button from "../components/ui/Button";
@@ -144,6 +144,31 @@ function inputClasses(hasError) {
   }`;
 }
 
+function NextStepsCard({ compact = false, className = "" }) {
+  const items = compact ? nextSteps.slice(0, 3) : nextSteps;
+
+  return (
+    <Card className={`border-sand/80 bg-white/74 p-7 ${className}`.trim()}>
+      <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#015451]">
+        What happens next?
+      </p>
+      <div className={`mt-6 grid ${compact ? "gap-3" : "gap-4"}`}>
+        {items.map((item, index) => (
+          <div
+            key={item}
+            className={compact ? "flex items-start gap-3" : "flex items-start gap-4 rounded-[1.5rem] bg-[#F8FBFA] px-4 py-4"}
+          >
+            <span className={`flex items-center justify-center rounded-full bg-[#0C7380] text-sm font-bold text-white ${compact ? "h-8 w-8" : "h-9 w-9"}`}>
+              {index + 1}
+            </span>
+            <p className={`text-sm text-ink/72 ${compact ? "pt-1 leading-6" : "pt-1 leading-7"}`}>{item}</p>
+          </div>
+        ))}
+      </div>
+    </Card>
+  );
+}
+
 function validateForm(form) {
   const errors = {};
 
@@ -196,9 +221,27 @@ export default function Referrals() {
   const [submitting, setSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState("");
   const [submitted, setSubmitted] = useState(null);
+  const formTopRef = useRef(null);
+  const shouldScrollToFormRef = useRef(false);
 
   const supportSummary = useMemo(() => form.supportRequired.join(", "), [form.supportRequired]);
   const activeStep = formSteps[currentStep];
+
+  useEffect(() => {
+    if (!shouldScrollToFormRef.current) {
+      return;
+    }
+
+    shouldScrollToFormRef.current = false;
+    formTopRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }, [currentStep, submitted]);
+
+  function requestFormTopScroll() {
+    shouldScrollToFormRef.current = true;
+  }
 
   function updateField(name, value) {
     setForm((current) => ({ ...current, [name]: value }));
@@ -236,10 +279,12 @@ export default function Referrals() {
       return;
     }
 
+    requestFormTopScroll();
     setCurrentStep((step) => Math.min(step + 1, formSteps.length - 1));
   }
 
   function handlePreviousStep() {
+    requestFormTopScroll();
     setCurrentStep((step) => Math.max(step - 1, 0));
   }
 
@@ -275,6 +320,7 @@ export default function Referrals() {
     try {
       await apiPostJson(PUBLIC_API_ENDPOINTS.referrals, payload);
 
+      requestFormTopScroll();
       setSubmitted({
         participantName: payload.participantName,
         referrerName: payload.referrerName,
@@ -327,7 +373,7 @@ export default function Referrals() {
           <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
             <div>
               <ScrollReveal>
-                <div className="rounded-[2rem] border border-white/40 bg-white/68 p-7 shadow-soft backdrop-saturate-150 sm:p-8">
+                <div ref={formTopRef} className="rounded-[2rem] border border-white/40 bg-white/68 p-7 shadow-soft backdrop-saturate-150 sm:p-8">
                   <SectionHeader
                     badge="Referrals"
                     title="Referral Form"
@@ -338,25 +384,13 @@ export default function Referrals() {
               </ScrollReveal>
             </div>
 
-            <div>
+            {!submitted ? (
+              <div>
               <ScrollReveal>
-                <Card className="border-sand/80 bg-white/74 p-7">
-                  <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#015451]">
-                    What happens next?
-                  </p>
-                  <div className="mt-6 grid gap-3">
-                    {nextSteps.slice(0, 3).map((item, index) => (
-                      <div key={item} className="flex items-start gap-3">
-                        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#0C7380] text-sm font-bold text-white">
-                          {index + 1}
-                        </span>
-                        <p className="pt-1 text-sm leading-6 text-ink/72">{item}</p>
-                      </div>
-                    ))}
-                  </div>
-                </Card>
+                <NextStepsCard compact />
               </ScrollReveal>
-            </div>
+              </div>
+            ) : null}
           </div>
 
           {submitted ? (
@@ -401,21 +435,7 @@ export default function Referrals() {
 
               <div className="grid gap-6">
                 <ScrollReveal delay={120}>
-                  <Card className="border-sand/80 bg-white/74 p-7">
-                    <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#015451]">
-                      What happens next?
-                    </p>
-                    <div className="mt-6 grid gap-4">
-                      {nextSteps.map((item, index) => (
-                        <div key={item} className="flex items-start gap-4 rounded-[1.5rem] bg-[#F8FBFA] px-4 py-4">
-                          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0C7380] text-sm font-bold text-white">
-                            {index + 1}
-                          </span>
-                          <p className="pt-1 text-sm leading-7 text-ink/72">{item}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </Card>
+                  <NextStepsCard />
                 </ScrollReveal>
               </div>
             </div>
@@ -439,6 +459,7 @@ export default function Referrals() {
                           type="button"
                           onClick={() => {
                             if (index <= currentStep) {
+                              requestFormTopScroll();
                               setCurrentStep(index);
                             }
                           }}
@@ -477,8 +498,9 @@ export default function Referrals() {
                     title={activeStep.title}
                     description={activeStep.description}
                   >
-                    {currentStep === 0 ? (
-                      <>
+                    <div key={activeStep.key} className="referral-step-panel">
+                      {currentStep === 0 ? (
+                        <>
                         <div className="grid gap-5 sm:grid-cols-2">
                           <Field label="Participant full name" name="participantName" error={errors.participantName} required>
                             <input
@@ -570,11 +592,11 @@ export default function Referrals() {
                             </select>
                           </Field>
                         </div>
-                      </>
-                    ) : null}
+                        </>
+                      ) : null}
 
-                    {currentStep === 1 ? (
-                      <div className="grid gap-5 sm:grid-cols-2">
+                      {currentStep === 1 ? (
+                        <div className="grid gap-5 sm:grid-cols-2">
                         <Field label="Referrer full name" name="referrerName" error={errors.referrerName} required>
                           <input
                             id="referrerName"
@@ -632,11 +654,11 @@ export default function Referrals() {
                             />
                           </Field>
                         </div>
-                      </div>
-                    ) : null}
+                        </div>
+                      ) : null}
 
-                    {currentStep === 2 ? (
-                      <div className="grid gap-8">
+                      {currentStep === 2 ? (
+                        <div className="grid gap-8">
                         <div>
                           <fieldset>
                             <legend className="text-sm font-semibold text-ink">
@@ -783,8 +805,9 @@ export default function Referrals() {
                             <p><span className="font-semibold text-ink">Plan management:</span> {form.planManagement || "Not selected yet"}</p>
                           </div>
                         </div>
-                      </div>
-                    ) : null}
+                        </div>
+                      ) : null}
+                    </div>
 
                     {submissionError ? (
                       <div

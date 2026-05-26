@@ -16,6 +16,31 @@ function ContactIcon({ children }) {
   );
 }
 
+function MobileContactItem({ href, icon, iconClassName, children, className = "" }) {
+  const content = (
+    <>
+      <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center text-white">
+        <AppIcon name={icon} className={iconClassName} strokeWidth={1.8} />
+      </span>
+      <span>{children}</span>
+    </>
+  );
+
+  if (href) {
+    return (
+      <a href={href} className={`mt-3 flex items-start gap-3 text-sm text-white/82 ${className}`}>
+        {content}
+      </a>
+    );
+  }
+
+  return (
+    <p className={`mt-3 flex items-start gap-3 text-sm text-white/82 ${className}`}>
+      {content}
+    </p>
+  );
+}
+
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -292,18 +317,24 @@ export default function Header() {
 
           <div className="mt-4 rounded-[1rem] bg-[#015451] px-4 py-4 text-white">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-white/88">Contact</p>
-            <a href={company.phoneHref} className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-white">
-              <AppIcon name="phone" className="h-4 w-4" strokeWidth={1.8} />
-              <span>{company.phone}</span>
-            </a>
-            <a href={company.emailHref} className="mt-2 inline-flex items-center gap-2 text-sm text-white/82">
-              <AppIcon name="mail" className="h-4 w-4" strokeWidth={1.8} />
-              <span>{company.email}</span>
-            </a>
-            <p className="mt-2 inline-flex items-center gap-2 text-sm text-white/82">
-              <AppIcon name="mapPin" className="h-4 w-4" strokeWidth={1.8} />
-              <span>{company.topBarLocation}</span>
-            </p>
+            <MobileContactItem
+              href={company.phoneHref}
+              icon="phone"
+              iconClassName="h-[18px] w-[18px]"
+              className="font-semibold text-white"
+            >
+              {company.phone}
+            </MobileContactItem>
+            <MobileContactItem
+              href={company.emailHref}
+              icon="mail"
+              iconClassName="h-[18px] w-[18px]"
+            >
+              {company.email}
+            </MobileContactItem>
+            <MobileContactItem icon="mapPin" iconClassName="h-5 w-5">
+              {company.topBarLocation}
+            </MobileContactItem>
             <div className="mt-4">
               <Button to="/referrals" variant="secondary" className="w-full justify-center">
                 Make a Referral

@@ -510,7 +510,7 @@ export default function StaffTraining() {
             <ScrollReveal delay={180}>
               <div className="space-y-6">
                 <Card tint="teal" className="overflow-hidden rounded-[2.4rem] p-0">
-                  <div className="relative h-72 sm:h-80">
+                  <div className="relative m-6 overflow-hidden rounded-[2rem] h-72 sm:m-7 sm:h-80">
                     <Image
                       src={pageMedia.trainingHero}
                       alt="Emerging Nursing training session"
