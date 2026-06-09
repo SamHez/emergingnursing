@@ -19,7 +19,9 @@ export const siteConfig = {
 };
 
 export const isProductionIndexable =
-  process.env.VERCEL_ENV === "production" &&
+  (process.env.VERCEL_ENV === "production" ||
+    process.env.NODE_ENV === "production" ||
+    process.env.NEXT_PUBLIC_FORCE_INDEX === "true") &&
   siteConfig.configuredSiteUrl === siteConfig.siteUrl;
 
 export function createAbsoluteUrl(path = "/") {
